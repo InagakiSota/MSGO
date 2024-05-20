@@ -1,6 +1,12 @@
 {
 	"SourceFiles": [
 		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGO\\MSGO.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4UCapture\\VRM4UCapture.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4U\\VRM4U.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4UImporter\\VRM4UImporter.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4ULoader\\VRM4ULoader.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4UEditor\\VRM4UEditor.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Plugins\\VRM4U_5_0_20240212\\VRM4U\\Source\\VRM4UMisc\\VRM4UMisc.Build.cs",
 		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGO.Target.cs",
 		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGOEditor.Target.cs"
 	],

@@ -2967,6 +2967,58 @@
 		{
 			"Path": "$(ProjectDir)/Binaries/Win64/UnrealEditor-MSGO.pdb",
 			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4U.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4U.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UCapture.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UCapture.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UEditor.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UEditor.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UImporter.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UImporter.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4ULoader.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4ULoader.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UMisc.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/Binaries/Win64/UnrealEditor-VRM4UMisc.pdb",
+			"Type": "SymbolFile"
 		}
 	],
 	"RuntimeDependencies": [
@@ -23480,6 +23532,14 @@
 		},
 		{
 			"Path": "$(ProjectDir)/MSGO.uproject",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/ThirdParty/assimp/bin/x64/assimp-vc141-mt.dll",
+			"Type": "NonUFS"
+		},
+		{
+			"Path": "$(ProjectDir)/Plugins/VRM4U_5_0_20240212/VRM4U/VRM4U.uplugin",
 			"Type": "UFS"
 		}
 	],

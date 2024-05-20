@@ -1,0 +1,22 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\intermediate\\build\\win64\\unrealeditor\\development\\vrm4ueditor\\module.vrm4ueditor.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "g:\\workspace\\ue5\\msgo\\msgo\\intermediate\\build\\win64\\msgoeditor\\development\\unrealed\\sharedpch.unrealed.shadowerrors.h.pch",
+        "Includes": [
+            "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\intermediate\\build\\win64\\unrealeditor\\development\\vrm4ueditor\\definitions.vrm4ueditor.h",
+            "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\intermediate\\build\\win64\\unrealeditor\\inc\\vrm4ueditor\\vrm4ueditor.init.gen.cpp",
+            "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\intermediate\\build\\win64\\unrealeditor\\inc\\vrm4ueditor\\vrmeditorbpfunctionlibrary.gen.cpp",
+            "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\source\\vrm4ueditor\\public\\vrmeditorbpfunctionlibrary.h",
+            "g:\\epicgames\\ue_5.0\\engine\\source\\runtime\\engine\\classes\\engine\\texturerendertarget2d.h",
+            "g:\\epicgames\\ue_5.0\\engine\\source\\runtime\\engine\\classes\\engine\\texturerendertarget.h",
+            "g:\\epicgames\\ue_5.0\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\texturerendertarget.generated.h",
+            "g:\\epicgames\\ue_5.0\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\texturerendertarget2d.generated.h",
+            "g:\\epicgames\\ue_5.0\\engine\\source\\runtime\\core\\public\\misc\\engineversioncomparison.h",
+            "g:\\workspace\\ue5\\msgo\\msgo\\plugins\\vrm4u_5_0_20240212\\vrm4u\\intermediate\\build\\win64\\unrealeditor\\inc\\vrm4ueditor\\vrmeditorbpfunctionlibrary.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

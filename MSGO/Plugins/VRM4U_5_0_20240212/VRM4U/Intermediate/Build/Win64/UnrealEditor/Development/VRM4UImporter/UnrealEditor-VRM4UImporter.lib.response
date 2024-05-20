@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-VRM4UImporter.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\MSGOEditor\Development\UnrealEd\SharedPCH.UnrealEd.ShadowErrors.h.obj"
+"G:\WorkSpace\UE5\MSGO\MSGO\Plugins\VRM4U_5_0_20240212\VRM4U\Intermediate\Build\Win64\UnrealEditor\Development\VRM4UImporter\Module.VRM4UImporter.cpp.obj"
+"G:\WorkSpace\UE5\MSGO\MSGO\Plugins\VRM4U_5_0_20240212\VRM4U\Intermediate\Build\Win64\UnrealEditor\Development\VRM4UImporter\Module.VRM4UImporter.gen.cpp.obj"
+"G:\WorkSpace\UE5\MSGO\MSGO\Plugins\VRM4U_5_0_20240212\VRM4U\Intermediate\Build\Win64\UnrealEditor\Development\VRM4UImporter\Default.rc2.res"
+/OUT:"G:\WorkSpace\UE5\MSGO\MSGO\Plugins\VRM4U_5_0_20240212\VRM4U\Intermediate\Build\Win64\UnrealEditor\Development\VRM4UImporter\UnrealEditor-VRM4UImporter.lib"
