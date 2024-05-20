@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "MSGO",
+			"Path": "G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGO.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "MSGOEditor",
+			"Path": "G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGOEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

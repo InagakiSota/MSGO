@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGO\\MSGO.Build.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGO.Target.cs",
+		"G:\\WorkSpace\\UE5\\MSGO\\MSGO\\Source\\MSGOEditor.Target.cs"
+	],
+	"EngineVersion": "5.0.3"
+}

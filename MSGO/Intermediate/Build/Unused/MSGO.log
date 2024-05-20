@@ -1,0 +1,28 @@
+﻿  Cleaning MSGOEditor and UnrealHeaderTool binaries...
+  Using bundled DotNet SDK
+  Log file: C:\Users\ingksut\AppData\Local\UnrealBuildTool\Log.txt
+  Creating makefile for MSGOEditor (no existing makefile)
+  Parsing headers for MSGOEditor
+    Running UnrealHeaderTool "G:\WorkSpace\UE5\MSGO\MSGO\MSGO.uproject" "G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\MSGOEditor\Development\MSGOEditor.uhtmanifest" -LogCmds="loginit warning, logexit warning, logdatabase error" -Unattended -WarningsAsErrors -abslog="C:\Users\ingksut\AppData\Local\UnrealBuildTool\Log_UHT.txt" -installed
+  Reflection code generated for MSGOEditor in 1.777517 seconds
+  Building MSGOEditor...
+  Using Visual Studio 2019 14.29.30152 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133) and Windows 10.0.17763.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+  [Adaptive Build] Excluded from MSGO unity file: MSGO.cpp, MSGOCharacter.cpp, MSGOGameMode.cpp
+  Determining max actions to execute in parallel (8 physical cores, 16 logical cores)
+    Executing up to 8 processes, one per physical core
+  Building 11 actions with 8 processes...
+  [1/11] Resource Default.rc2
+  [2/11] Compile SharedPCH.Engine.ShadowErrors.cpp
+  [3/11] Compile MSGO.init.gen.cpp
+  [4/11] Compile MSGO.cpp
+  [5/11] Compile MSGOGameMode.gen.cpp
+  [6/11] Compile MSGOCharacter.gen.cpp
+  [7/11] Compile MSGOGameMode.cpp
+  [8/11] Compile MSGOCharacter.cpp
+  [9/11] Link UnrealEditor-MSGO.lib
+     ライブラリ G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\UnrealEditor\Development\MSGO\UnrealEditor-MSGO.lib とオブジェクト G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\UnrealEditor\Development\MSGO\UnrealEditor-MSGO.exp を作成中
+  [10/11] Link UnrealEditor-MSGO.dll
+     ライブラリ G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\UnrealEditor\Development\MSGO\UnrealEditor-MSGO.suppressed.lib とオブジェクト G:\WorkSpace\UE5\MSGO\MSGO\Intermediate\Build\Win64\UnrealEditor\Development\MSGO\UnrealEditor-MSGO.suppressed.exp を作成中
+  [11/11] WriteMetadata MSGOEditor.target
+  Total time in Parallel executor: 33.96 seconds
+  Total execution time: 46.04 seconds
