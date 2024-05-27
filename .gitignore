@@ -72,5 +72,10 @@ MSGO/Saved/*
 Intermediate/*
 Plugins/*/Intermediate/*
 
+MSGO/Intermediate/*
+MSGO/Plugins/*/Intermediate/*
+
 # Cache files for the editor to use
 DerivedDataCache/*
+MSGO/DerivedDataCache/*
+
