@@ -79,3 +79,7 @@ MSGO/Plugins/*/Intermediate/*
 DerivedDataCache/*
 MSGO/DerivedDataCache/*
 
+
+MSGO/Intermediate/
+
+MSGO/Plugins/VRM4U_5_0_20240212/VRM4U/Intermediate/

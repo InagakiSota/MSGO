@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MSGOGameMode.h"
-#include "MSGOCharacter.h"
+#include "Characters/MSGOCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AMSGOGameMode::AMSGOGameMode()
