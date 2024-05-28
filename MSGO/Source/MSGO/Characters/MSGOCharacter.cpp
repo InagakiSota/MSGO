@@ -64,26 +64,6 @@ AMSGOCharacter::AMSGOCharacter()
 
 void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	//// Set up gameplay key bindings
-	//check(PlayerInputComponent);
-	//PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	//PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
-	//PlayerInputComponent->BindAxis("Move Forward / Backward", this, &AMSGOCharacter::MoveForward);
-	//PlayerInputComponent->BindAxis("Move Right / Left", this, &AMSGOCharacter::MoveRight);
-
-	//// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	//// "turn" handles devices that provide an absolute delta, such as a mouse.
-	//// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	//PlayerInputComponent->BindAxis("Turn Right / Left Mouse", this, &APawn::AddControllerYawInput);
-	//PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &AMSGOCharacter::TurnAtRate);
-	//PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
-	//PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &AMSGOCharacter::LookUpAtRate);
-
-	//// handle touch devices
-	//PlayerInputComponent->BindTouch(IE_Pressed, this, &AMSGOCharacter::TouchStarted);
-	//PlayerInputComponent->BindTouch(IE_Released, this, &AMSGOCharacter::TouchStopped);
-
 	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// 移動
@@ -101,8 +81,9 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 
 		// ジャンプ
-		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Started, this, &AMSGOCharacter::Jump);
-		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AMSGOCharacter::StopJumping);
+		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressJump);
+		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AMSGOCharacter::OnReleaseJump);
+		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AMSGOCharacter::UpdateJump);
 
 	}
 }
@@ -113,13 +94,7 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if ((Controller != nullptr) && (MovementVector.Length() > 0.0f))
-	{
-		//const FRotator rot = Controller->GetControlRotation();
-		//const FRotator yawRot(0, rot.Yaw, 0);
-
-		//// get forward vector
-		//const FVector Direction = FRotationMatrix(yawRot).GetUnitAxis(EAxis::X) * FRotationMatrix(yawRot).GetUnitAxis(EAxis::Y);
-		
+	{	
 		MovementVector.Normalize();
 		FVector2D inputDir = MovementVector.GetRotated(Controller->GetControlRotation().Yaw);
 
@@ -132,6 +107,10 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 void AMSGOCharacter::OnPressDash()
 {
 	GetCharacterMovement()->MaxWalkSpeed = DASH_SPEED_MAX;
+
+	GetCharacterMovement()->GravityScale = 0.2;
+
+
 	bIsDash = true;
 }
 // ダッシュ　リリース
@@ -139,8 +118,35 @@ void AMSGOCharacter::OnReleaseDash()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WALK_SPEED_MAX;
 
+	GetCharacterMovement()->GravityScale = 1.0f;
+
 	bIsDash = false;
 }
+
+// ジャンプ　入力
+void AMSGOCharacter::OnPressJump()
+{
+	Jump();
+}
+// ジャンプ　リリース
+void AMSGOCharacter::OnReleaseJump()
+{
+	StopJumping();
+
+	GetCharacterMovement()->GravityScale = 1.0f;
+
+}
+// ジャンプ　入力中
+void AMSGOCharacter::UpdateJump()
+{
+	FVector velocity = GetCharacterMovement()->Velocity;
+
+	if (velocity.Z < 0)
+	{
+		GetCharacterMovement()->GravityScale = 0.2;
+	}
+}
+
 
 // 視点操作
 void AMSGOCharacter::Look(const FInputActionValue& Value)

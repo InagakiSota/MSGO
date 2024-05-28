@@ -109,6 +109,13 @@ protected:
 	// ダッシュ　リリース
 	void OnReleaseDash();
 
+	// ジャンプ　入力
+	void OnPressJump();
+	// ジャンプ　リリース
+	void OnReleaseJump();
+	// ジャンプ　入力中
+	void UpdateJump();
+
 
 protected:
 	// APawn interface
