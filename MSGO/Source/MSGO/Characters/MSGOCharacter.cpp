@@ -55,6 +55,9 @@ AMSGOCharacter::AMSGOCharacter()
 
 	bIsDash = false;
 
+	YawRotSpeed = 10.f;
+	DashRiseSpeed = 1.f;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -68,6 +71,7 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	{
 		// 移動
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMSGOCharacter::Move);
+		enhancedInput->BindAction(IA_Move, ETriggerEvent::Completed, this, &AMSGOCharacter::EndMove);
 
 		// 攻撃
 		//enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::);
@@ -91,34 +95,56 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 // 移動処理
 void AMSGOCharacter::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	MoveInput = Value.Get<FVector2D>();
 
-	if ((Controller != nullptr) && (MovementVector.Length() > 0.0f))
+	if ((Controller != nullptr) && (MoveInput.Length() > 0.0f))
 	{	
-		MovementVector.Normalize();
-		FVector2D inputDir = MovementVector.GetRotated(Controller->GetControlRotation().Yaw);
+		RotToCamera(YawRotSpeed);
 
+		MoveInput.Normalize();
+		FVector2D inputDir = MoveInput.GetRotated(Controller->GetControlRotation().Yaw);
 
 		AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
 	}
 }
 
+// 移動終了
+void AMSGOCharacter::EndMove()
+{
+	MoveInput = FVector2D(0, 0);
+
+	if (bIsDash)
+	{
+		OnReleaseDash();
+	}
+
+}
+
 // ダッシュ　入力
 void AMSGOCharacter::OnPressDash()
 {
-	GetCharacterMovement()->MaxWalkSpeed = DASH_SPEED_MAX;
+	if (MoveInput.Length() > 0.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = DASH_SPEED_MAX;
+		GetCharacterMovement()->MaxFlySpeed = DASH_SPEED_MAX;
+		GetCharacterMovement()->GravityScale = 0.1;
 
-	GetCharacterMovement()->GravityScale = 0.2;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
-
-	bIsDash = true;
+		bIsDash = true;
+	}
+	
 }
 // ダッシュ　リリース
 void AMSGOCharacter::OnReleaseDash()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WALK_SPEED_MAX;
+	GetCharacterMovement()->MaxFlySpeed = WALK_SPEED_MAX;
 
 	GetCharacterMovement()->GravityScale = 1.0f;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
 
 	bIsDash = false;
 }
@@ -126,24 +152,45 @@ void AMSGOCharacter::OnReleaseDash()
 // ジャンプ　入力
 void AMSGOCharacter::OnPressJump()
 {
-	Jump();
+	if (bIsDash)
+	{
+	}
+	else
+	{
+		Jump();
+	}
+	
 }
 // ジャンプ　リリース
 void AMSGOCharacter::OnReleaseJump()
 {
-	StopJumping();
+	if (!bIsDash)
+	{
+		StopJumping();
 
-	GetCharacterMovement()->GravityScale = 1.0f;
-
+		GetCharacterMovement()->GravityScale = 1.0f;
+	}
+	
 }
 // ジャンプ　入力中
 void AMSGOCharacter::UpdateJump()
 {
-	FVector velocity = GetCharacterMovement()->Velocity;
-
-	if (velocity.Z < 0)
+	if (!bIsDash)
 	{
-		GetCharacterMovement()->GravityScale = 0.2;
+		FVector velocity = GetCharacterMovement()->Velocity;
+
+		if (velocity.Z < 0)
+		{
+			GetCharacterMovement()->GravityScale = 0.1;
+		}
+	
+	}
+	else
+	{
+		FVector actorPos = FVector(0.0,0.0,DashRiseSpeed);
+
+		AddActorWorldOffset(actorPos);
+
 	}
 }
 
@@ -158,4 +205,18 @@ void AMSGOCharacter::Look(const FInputActionValue& Value)
 
 }
 
+// カメラの向いている方に向く
+void AMSGOCharacter::RotToCamera(float InRotSpeed)
+{
+	// カメラの角度(Yawのみ)を取得
+	FRotator cameraRot = FollowCamera->GetComponentRotation();
+	cameraRot.Pitch = cameraRot.Roll = 0.0f;
 
+	// 自身の角度(Yawのみ)を取得
+	FRotator nowRot = GetActorRotation();
+	nowRot.Pitch = nowRot.Roll = 0.0f;
+
+	// カメラの向いている方向に回転
+	SetActorRotation(FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed));
+
+}

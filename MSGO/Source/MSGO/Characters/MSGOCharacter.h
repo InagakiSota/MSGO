@@ -94,12 +94,29 @@ protected:
 	UInputAction* IA_Look;
 
 protected:
+	// 移動入力値
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
+	FVector2D MoveInput;
+
+	// ダッシュ中かのフラグ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	bool bIsDash;
+
+	// Yawの回転速度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
+	float YawRotSpeed;
+
+	// ダッシュ中の上昇速度
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
+	float DashRiseSpeed;
+
 
 protected:
 	// 移動処理
 	void Move(const FInputActionValue& Value);
+
+	// 移動終了
+	void EndMove();
 
 	// 視点操作
 	void Look(const FInputActionValue& Value);
@@ -127,5 +144,9 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	// カメラの向いている方に向く
+	UFUNCTION(BlueprintCallable)
+	void RotToCamera(float InRotSpeed);
 };
 
