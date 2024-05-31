@@ -10,6 +10,14 @@
 
 #include "MSGOCharacter.generated.h"
 
+// 移動タイプ
+UENUM(BlueprintType)
+enum class EMOVE_TYPE : uint8
+{
+	Walk,		// 歩行
+	Dash,		// 走行
+};
+
 UCLASS(config=Game)
 class AMSGOCharacter : public ACharacter
 {
@@ -98,9 +106,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
 	FVector2D MoveInput;
 
-	// ダッシュ中かのフラグ
+	// 移動タイプ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
-	bool bIsDash;
+	TEnumAsByte<EMOVE_TYPE> MoveType;
 
 	// Yawの回転速度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
@@ -109,6 +117,12 @@ protected:
 	// ダッシュ中の上昇速度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	float DashRiseSpeed;
+
+private:
+	// 前フレームの移動入力値
+	FVector2D PrevMoveInput;
+
+	FVector2D TempMoveInput;
 
 
 protected:

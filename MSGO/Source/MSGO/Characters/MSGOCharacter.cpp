@@ -53,10 +53,12 @@ AMSGOCharacter::AMSGOCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	bIsDash = false;
+	MoveType = EMOVE_TYPE::Walk;
 
 	YawRotSpeed = 10.f;
 	DashRiseSpeed = 1.f;
+
+	PrevMoveInput = TempMoveInput = FVector2D(0.0f,0.0f);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -113,10 +115,10 @@ void AMSGOCharacter::EndMove()
 {
 	MoveInput = FVector2D(0, 0);
 
-	if (bIsDash)
-	{
-		OnReleaseDash();
-	}
+	//if (MoveType == EMOVE_TYPE::Dash)
+	//{
+	//	OnReleaseDash();
+	//}
 
 }
 
@@ -129,9 +131,10 @@ void AMSGOCharacter::OnPressDash()
 		GetCharacterMovement()->MaxFlySpeed = DASH_SPEED_MAX;
 		GetCharacterMovement()->GravityScale = 0.1;
 
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
-		bIsDash = true;
+		// 移動タイプをダッシュにする
+		MoveType = EMOVE_TYPE::Dash;
 	}
 	
 }
@@ -143,19 +146,16 @@ void AMSGOCharacter::OnReleaseDash()
 
 	GetCharacterMovement()->GravityScale = 1.0f;
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
-
-	bIsDash = false;
+	// 移動タイプを歩行に戻す
+	MoveType = EMOVE_TYPE::Walk;
 }
 
 // ジャンプ　入力
 void AMSGOCharacter::OnPressJump()
 {
-	if (bIsDash)
-	{
-	}
-	else
+	if (MoveType == EMOVE_TYPE::Walk)
 	{
 		Jump();
 	}
@@ -164,7 +164,7 @@ void AMSGOCharacter::OnPressJump()
 // ジャンプ　リリース
 void AMSGOCharacter::OnReleaseJump()
 {
-	if (!bIsDash)
+	if (MoveType == EMOVE_TYPE::Walk)
 	{
 		StopJumping();
 
@@ -175,7 +175,7 @@ void AMSGOCharacter::OnReleaseJump()
 // ジャンプ　入力中
 void AMSGOCharacter::UpdateJump()
 {
-	if (!bIsDash)
+	if (MoveType == EMOVE_TYPE::Walk)
 	{
 		FVector velocity = GetCharacterMovement()->Velocity;
 
@@ -188,7 +188,6 @@ void AMSGOCharacter::UpdateJump()
 	else
 	{
 		FVector actorPos = FVector(0.0,0.0,DashRiseSpeed);
-
 		AddActorWorldOffset(actorPos);
 
 	}
