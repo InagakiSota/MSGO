@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MSGOCharacter.h"
 #include "Camera/CameraComponent.h"
@@ -10,12 +10,17 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/CharacterStatusComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
 
-const float AMSGOCharacter::WALK_SPEED_MAX = 500.0f;
-const float AMSGOCharacter::DASH_SPEED_MAX = 1000.0f;
+const float AMSGOCharacter::MAX_SPEED_WALK = 500.0f;
+const float AMSGOCharacter::MAX_SPEED_DASH = 1000.0f;
+
+const float AMSGOCharacter::MAX_ACCELERATION_WALK = 2048.f;
+const float AMSGOCharacter::MAX_ACCELERATION_DASH = 10000.f;
+
 
 AMSGOCharacter::AMSGOCharacter()
 {
@@ -38,7 +43,7 @@ AMSGOCharacter::AMSGOCharacter()
 	// instead of recompiling to adjust them
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = WALK_SPEED_MAX;
+	GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_WALK;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -60,6 +65,9 @@ AMSGOCharacter::AMSGOCharacter()
 
 	PrevMoveInput = TempMoveInput = FVector2D(0.0f,0.0f);
 
+	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
+	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -71,22 +79,22 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 {
 	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		// ˆÚ“®
+		// ç§»å‹•
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMSGOCharacter::Move);
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Completed, this, &AMSGOCharacter::EndMove);
 
-		// UŒ‚
+		// æ”»æ’ƒ
 		//enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::);
 
-		// ‹“_‘€ì
+		// è¦–ç‚¹æ“ä½œ
 		enhancedInput->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AMSGOCharacter::Look);
 
-		// ƒ_ƒbƒVƒ…
+		// ãƒ€ãƒƒã‚·ãƒ¥
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressDash);
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AMSGOCharacter::OnReleaseDash);
 
 
-		// ƒWƒƒƒ“ƒv
+		// ã‚¸ãƒ£ãƒ³ãƒ—
 		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressJump);
 		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AMSGOCharacter::OnReleaseJump);
 		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AMSGOCharacter::UpdateJump);
@@ -94,7 +102,7 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	}
 }
 
-// ˆÚ“®ˆ—
+// ç§»å‹•å‡¦ç†
 void AMSGOCharacter::Move(const FInputActionValue& Value)
 {
 	MoveInput = Value.Get<FVector2D>();
@@ -110,49 +118,51 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-// ˆÚ“®I—¹
+// ç§»å‹•çµ‚äº†
 void AMSGOCharacter::EndMove()
 {
 	MoveInput = FVector2D(0, 0);
 
-	//if (MoveType == EMOVE_TYPE::Dash)
-	//{
-	//	OnReleaseDash();
-	//}
+	if (MoveType == EMOVE_TYPE::Dash)
+	{
+		OnReleaseDash();
+	}
 
 }
 
-// ƒ_ƒbƒVƒ…@“ü—Í
+// ãƒ€ãƒƒã‚·ãƒ¥ã€€å…¥åŠ›
 void AMSGOCharacter::OnPressDash()
 {
 	if (MoveInput.Length() > 0.0f)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = DASH_SPEED_MAX;
-		GetCharacterMovement()->MaxFlySpeed = DASH_SPEED_MAX;
-		GetCharacterMovement()->GravityScale = 0.1;
+		GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_DASH;
+		GetCharacterMovement()->MaxFlySpeed = MAX_SPEED_DASH;
+		GetCharacterMovement()->MaxAcceleration = MAX_ACCELERATION_DASH;
+		GetCharacterMovement()->GravityScale = 0.0;
 
-		//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
-		// ˆÚ“®ƒ^ƒCƒv‚ğƒ_ƒbƒVƒ…‚É‚·‚é
+		// ç§»å‹•ã‚¿ã‚¤ãƒ—ã‚’ãƒ€ãƒƒã‚·ãƒ¥ã«ã™ã‚‹
 		MoveType = EMOVE_TYPE::Dash;
 	}
 	
 }
-// ƒ_ƒbƒVƒ…@ƒŠƒŠ[ƒX
+// ãƒ€ãƒƒã‚·ãƒ¥ã€€ãƒªãƒªãƒ¼ã‚¹
 void AMSGOCharacter::OnReleaseDash()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WALK_SPEED_MAX;
-	GetCharacterMovement()->MaxFlySpeed = WALK_SPEED_MAX;
-
+	GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_WALK;
+	GetCharacterMovement()->MaxFlySpeed = MAX_SPEED_WALK;
+	GetCharacterMovement()->MaxAcceleration = MAX_ACCELERATION_WALK;
+	GetCharacterMovement()->MaxAcceleration = 10000;
 	GetCharacterMovement()->GravityScale = 1.0f;
 
-	//GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
-	// ˆÚ“®ƒ^ƒCƒv‚ğ•às‚É–ß‚·
+	// ç§»å‹•ã‚¿ã‚¤ãƒ—ã‚’æ­©è¡Œã«æˆ»ã™
 	MoveType = EMOVE_TYPE::Walk;
 }
 
-// ƒWƒƒƒ“ƒv@“ü—Í
+// ã‚¸ãƒ£ãƒ³ãƒ—ã€€å…¥åŠ›
 void AMSGOCharacter::OnPressJump()
 {
 	if (MoveType == EMOVE_TYPE::Walk)
@@ -161,7 +171,7 @@ void AMSGOCharacter::OnPressJump()
 	}
 	
 }
-// ƒWƒƒƒ“ƒv@ƒŠƒŠ[ƒX
+// ã‚¸ãƒ£ãƒ³ãƒ—ã€€ãƒªãƒªãƒ¼ã‚¹
 void AMSGOCharacter::OnReleaseJump()
 {
 	if (MoveType == EMOVE_TYPE::Walk)
@@ -172,9 +182,10 @@ void AMSGOCharacter::OnReleaseJump()
 	}
 	
 }
-// ƒWƒƒƒ“ƒv@“ü—Í’†
+// ã‚¸ãƒ£ãƒ³ãƒ—ã€€å…¥åŠ›ä¸­
 void AMSGOCharacter::UpdateJump()
 {
+	// è½ä¸‹æ™‚ã«ã‚¸ãƒ£ãƒ³ãƒ—ãƒœã‚¿ãƒ³ã‚’æ¨ã—ã¦ã„ã‚‹å ´åˆã¯ãƒ›ãƒãƒªãƒ³ã‚°ã™ã‚‹
 	if (MoveType == EMOVE_TYPE::Walk)
 	{
 		FVector velocity = GetCharacterMovement()->Velocity;
@@ -185,16 +196,17 @@ void AMSGOCharacter::UpdateJump()
 		}
 	
 	}
+	// ãƒ€ãƒƒã‚·ãƒ¥ä¸­ã¯ã‚¸ãƒ£ãƒ³ãƒ—ã˜ã‚ƒãªãä¸Šæ˜‡ã•ã›ã‚‹
 	else
 	{
-		FVector actorPos = FVector(0.0,0.0,DashRiseSpeed);
+		FVector actorPos = FVector(0.0, 0.0, DashRiseSpeed);
 		AddActorWorldOffset(actorPos);
 
 	}
 }
 
 
-// ‹“_‘€ì
+// è¦–ç‚¹æ“ä½œ
 void AMSGOCharacter::Look(const FInputActionValue& Value)
 {
 	FVector2D LookInput = Value.Get<FVector2D>();
@@ -204,18 +216,18 @@ void AMSGOCharacter::Look(const FInputActionValue& Value)
 
 }
 
-// ƒJƒƒ‰‚ÌŒü‚¢‚Ä‚¢‚é•û‚ÉŒü‚­
+// ã‚«ãƒ¡ãƒ©ã®å‘ã„ã¦ã„ã‚‹æ–¹ã«å‘ã
 void AMSGOCharacter::RotToCamera(float InRotSpeed)
 {
-	// ƒJƒƒ‰‚ÌŠp“x(Yaw‚Ì‚İ)‚ğæ“¾
+	// ã‚«ãƒ¡ãƒ©ã®è§’åº¦(Yawã®ã¿)ã‚’å–å¾—
 	FRotator cameraRot = FollowCamera->GetComponentRotation();
 	cameraRot.Pitch = cameraRot.Roll = 0.0f;
 
-	// ©g‚ÌŠp“x(Yaw‚Ì‚İ)‚ğæ“¾
+	// è‡ªèº«ã®è§’åº¦(Yawã®ã¿)ã‚’å–å¾—
 	FRotator nowRot = GetActorRotation();
 	nowRot.Pitch = nowRot.Roll = 0.0f;
 
-	// ƒJƒƒ‰‚ÌŒü‚¢‚Ä‚¢‚é•ûŒü‚É‰ñ“]
+	// ã‚«ãƒ¡ãƒ©ã®å‘ã„ã¦ã„ã‚‹æ–¹å‘ã«å›è»¢
 	SetActorRotation(FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed));
 
 }

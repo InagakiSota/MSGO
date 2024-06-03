@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -10,24 +10,31 @@
 
 #include "MSGOCharacter.generated.h"
 
-// ˆÚ“®ƒ^ƒCƒv
+// ç§»å‹•ã‚¿ã‚¤ãƒ—
 UENUM(BlueprintType)
 enum class EMOVE_TYPE : uint8
 {
-	Walk,		// •às
-	Dash,		// ‘–s
+	Walk,		// æ­©è¡Œ
+	Dash,		// èµ°è¡Œ
 };
 
+class UCharacterStatusComponent;
+
 UCLASS(config=Game)
-class AMSGOCharacter : public ACharacter
+class MSGO_API AMSGOCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 protected:
-	// •às‚ÌÅ‚‘¬“x
-	static const float WALK_SPEED_MAX;
-	// ƒ_ƒbƒVƒ…‚ÌÅ‚‘¬“x
-	static const float DASH_SPEED_MAX;
+	// æ­©è¡Œæ™‚ã®æœ€é«˜é€Ÿåº¦
+	static const float MAX_SPEED_WALK;
+	// ãƒ€ãƒƒã‚·ãƒ¥æ™‚ã®æœ€é«˜é€Ÿåº¦
+	static const float MAX_SPEED_DASH;
+
+	// æ­©è¡Œæ™‚ã®æœ€é«˜åŠ é€Ÿåº¦
+	static const float MAX_ACCELERATION_WALK;
+	// ãƒ€ãƒƒã‚·ãƒ¥æ™‚ã®æœ€é«˜åŠ é€Ÿåº¦
+	static const float MAX_ACCELERATION_DASH;
 
 public:
 	/** Camera boom positioning the camera behind the character */
@@ -49,102 +56,106 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* MappingContext;
 	
-	// InputAction:UŒ‚
+	// InputAction:æ”»æ’ƒ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Attack;
 
-	// InputAction:ƒAƒNƒVƒ‡ƒ“
+	// InputAction:ã‚¢ã‚¯ã‚·ãƒ§ãƒ³
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Action;
 	
-	// InputAction:ƒƒbƒNƒIƒ“
+	// InputAction:ãƒ­ãƒƒã‚¯ã‚ªãƒ³
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_LockOn;
 
-	// InputAction:ˆÚ“®
+	// InputAction:ç§»å‹•
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Move;
 
-	// InputAction:ƒ_ƒbƒVƒ…
+	// InputAction:ãƒ€ãƒƒã‚·ãƒ¥
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Dash;
 
-	// InputAction:‚µ‚á‚ª‚İ
+	// InputAction:ã—ã‚ƒãŒã¿
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Squat;
 
-	// InputAction:ƒWƒƒƒ“ƒv
+	// InputAction:ã‚¸ãƒ£ãƒ³ãƒ—
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Jump;
 
-	// InputAction:•ŠíØ‚è‘Ö‚¦1
+	// InputAction:æ­¦å™¨åˆ‡ã‚Šæ›¿ãˆ1
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeapon1;
 
-	// InputAction:•ŠíØ‚è‘Ö‚¦2
+	// InputAction:æ­¦å™¨åˆ‡ã‚Šæ›¿ãˆ2
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeapon2;
 
-	// InputAction:•ŠíØ‚è‘Ö‚¦3
+	// InputAction:æ­¦å™¨åˆ‡ã‚Šæ›¿ãˆ3
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeapon3;
 
-	// InputAction:•ŠíØ‚è‘Ö‚¦ Ÿ
+	// InputAction:æ­¦å™¨åˆ‡ã‚Šæ›¿ãˆ æ¬¡
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeaponNext;
 
-	// InputAction:•ŠíØ‚è‘Ö‚¦@‘O
+	// InputAction:æ­¦å™¨åˆ‡ã‚Šæ›¿ãˆã€€å‰
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeaponPrev;
 
-	// InputAction:‹“_‘€ì
+	// InputAction:è¦–ç‚¹æ“ä½œ
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Look;
 
 protected:
-	// ˆÚ“®“ü—Í’l
+	// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã®ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	TObjectPtr<UCharacterStatusComponent> StatusComponent;
+
+	// ç§»å‹•å…¥åŠ›å€¤
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
 	FVector2D MoveInput;
 
-	// ˆÚ“®ƒ^ƒCƒv
+	// ç§»å‹•ã‚¿ã‚¤ãƒ—
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	TEnumAsByte<EMOVE_TYPE> MoveType;
 
-	// Yaw‚Ì‰ñ“]‘¬“x
+	// Yawã®å›è»¢é€Ÿåº¦
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	float YawRotSpeed;
 
-	// ƒ_ƒbƒVƒ…’†‚Ìã¸‘¬“x
+	// ãƒ€ãƒƒã‚·ãƒ¥ä¸­ã®ä¸Šæ˜‡é€Ÿåº¦
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	float DashRiseSpeed;
 
 private:
-	// ‘OƒtƒŒ[ƒ€‚ÌˆÚ“®“ü—Í’l
+	// å‰ãƒ•ãƒ¬ãƒ¼ãƒ ã®ç§»å‹•å…¥åŠ›å€¤
 	FVector2D PrevMoveInput;
 
 	FVector2D TempMoveInput;
 
 
 protected:
-	// ˆÚ“®ˆ—
+	// ç§»å‹•å‡¦ç†
 	void Move(const FInputActionValue& Value);
 
-	// ˆÚ“®I—¹
+	// ç§»å‹•çµ‚äº†
 	void EndMove();
 
-	// ‹“_‘€ì
+	// è¦–ç‚¹æ“ä½œ
 	void Look(const FInputActionValue& Value);
 
-	// ƒ_ƒbƒVƒ…@“ü—Í
+	// ãƒ€ãƒƒã‚·ãƒ¥ã€€å…¥åŠ›
 	void OnPressDash();
-	// ƒ_ƒbƒVƒ…@ƒŠƒŠ[ƒX
+	// ãƒ€ãƒƒã‚·ãƒ¥ã€€ãƒªãƒªãƒ¼ã‚¹
 	void OnReleaseDash();
 
-	// ƒWƒƒƒ“ƒv@“ü—Í
+	// ã‚¸ãƒ£ãƒ³ãƒ—ã€€å…¥åŠ›
 	void OnPressJump();
-	// ƒWƒƒƒ“ƒv@ƒŠƒŠ[ƒX
+	// ã‚¸ãƒ£ãƒ³ãƒ—ã€€ãƒªãƒªãƒ¼ã‚¹
 	void OnReleaseJump();
-	// ƒWƒƒƒ“ƒv@“ü—Í’†
+	// ã‚¸ãƒ£ãƒ³ãƒ—ã€€å…¥åŠ›ä¸­
 	void UpdateJump();
 
 
@@ -153,13 +164,19 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã®å–å¾—
+	UCharacterStatusComponent* GetCharacterStatusComponent()
+	{
+		return StatusComponent;
+	}
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	// ƒJƒƒ‰‚ÌŒü‚¢‚Ä‚¢‚é•û‚ÉŒü‚­
+	// ã‚«ãƒ¡ãƒ©ã®å‘ã„ã¦ã„ã‚‹æ–¹ã«å‘ã
 	UFUNCTION(BlueprintCallable)
 	void RotToCamera(float InRotSpeed);
 };
