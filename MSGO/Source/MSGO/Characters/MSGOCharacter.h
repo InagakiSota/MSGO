@@ -26,15 +26,6 @@ class MSGO_API AMSGOCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	// 歩行時の最高速度
-	static const float MAX_SPEED_WALK;
-	// ダッシュ時の最高速度
-	static const float MAX_SPEED_DASH;
-
-	// 歩行時の最高加速度
-	static const float MAX_ACCELERATION_WALK;
-	// ダッシュ時の最高加速度
-	static const float MAX_ACCELERATION_DASH;
 
 public:
 	/** Camera boom positioning the camera behind the character */
@@ -47,9 +38,17 @@ public:
 public:
 	AMSGOCharacter();
 
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
 	float TurnRateGamepad;
+
+public:
+	// 機体ID
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter", meta = (DisplayName = "機体ID", DisplayPriority = "1"))
+	int32 MachineID;
 
 protected:
 	// MappingContext
@@ -135,6 +134,14 @@ private:
 
 	FVector2D TempMoveInput;
 
+	// 最高速度
+	int32 MaxSpeed;
+	// 最高歩行速度
+	int32 MaxWalkSpeed;
+	// 最高加速度
+	int32 MaxAcceleration;
+	// 歩行時最高加速度
+	int32 MaxWalkAcceleration;
 
 protected:
 	// 移動処理

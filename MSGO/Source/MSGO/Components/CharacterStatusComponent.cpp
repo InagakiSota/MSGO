@@ -12,6 +12,7 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	//SetupParameter();
 
 	// ...
 }
@@ -22,10 +23,7 @@ void UCharacterStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FCharacterStatusParameter parameterStatus;
-	UStaticDataManager::GetCharacterParameterData(this, 1, parameterStatus);
 
-	UKismetSystemLibrary::PrintString(this, parameterStatus.MachineName.ToString());
 
 }
 
@@ -38,3 +36,16 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ...
 }
 
+// パラメータのセットアップ
+// @param			InMachineID		機体ID
+void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
+{
+	UStaticDataManager::GetCharacterParameterData(this, InMachineID, StatusParameter);
+
+	NowHP = MaxHP = StatusParameter.MaxHP;
+
+	NowBoostCap = MaxBoostCap = StatusParameter.MaxBoostCap;
+
+	NowDownPoint = MaxDownPoint = StatusParameter.MaxDownPoint;
+
+}

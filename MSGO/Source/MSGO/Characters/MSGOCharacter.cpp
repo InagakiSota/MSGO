@@ -11,19 +11,18 @@
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/CharacterStatusComponent.h"
+#include "Structs/ParameterStructs.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
 
-const float AMSGOCharacter::MAX_SPEED_WALK = 500.0f;
-const float AMSGOCharacter::MAX_SPEED_DASH = 1000.0f;
-
-const float AMSGOCharacter::MAX_ACCELERATION_WALK = 2048.f;
-const float AMSGOCharacter::MAX_ACCELERATION_DASH = 10000.f;
-
 
 AMSGOCharacter::AMSGOCharacter()
 {
+	// ステータスコンポーネントをアタッチ
+	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
+
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -38,14 +37,6 @@ AMSGOCharacter::AMSGOCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_WALK;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -65,11 +56,38 @@ AMSGOCharacter::AMSGOCharacter()
 
 	PrevMoveInput = TempMoveInput = FVector2D(0.0f,0.0f);
 
-	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
 	
-
+	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+}
+
+void AMSGOCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//UKismetSystemLibrary::PrintString(this, "MSGOCharacter:BeginPlay");
+
+	StatusComponent->SetupParameter(MachineID);
+
+	// ステータスコンポーネントから速度を取得してくる
+	FCharacterStatusParameter statusParam = StatusComponent->GetStatusParameter();
+
+	MaxSpeed = statusParam.MaxSpeed;
+	MaxWalkSpeed = statusParam.MaxWalkSpeed;
+	MaxAcceleration = statusParam.MaxAcceleration;
+	MaxWalkAcceleration = statusParam.MaxWalkAcceleration;
+
+	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
+	// instead of recompiling to adjust them
+	GetCharacterMovement()->JumpZVelocity = 700.f;
+	GetCharacterMovement()->AirControl = 0.35f;
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
+	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -135,9 +153,9 @@ void AMSGOCharacter::OnPressDash()
 {
 	if (MoveInput.Length() > 0.0f)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_DASH;
-		GetCharacterMovement()->MaxFlySpeed = MAX_SPEED_DASH;
-		GetCharacterMovement()->MaxAcceleration = MAX_ACCELERATION_DASH;
+		GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+		GetCharacterMovement()->MaxFlySpeed = MaxSpeed;
+		GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
 		GetCharacterMovement()->GravityScale = 0.0;
 
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
@@ -150,10 +168,9 @@ void AMSGOCharacter::OnPressDash()
 // ダッシュ　リリース
 void AMSGOCharacter::OnReleaseDash()
 {
-	GetCharacterMovement()->MaxWalkSpeed = MAX_SPEED_WALK;
-	GetCharacterMovement()->MaxFlySpeed = MAX_SPEED_WALK;
-	GetCharacterMovement()->MaxAcceleration = MAX_ACCELERATION_WALK;
-	GetCharacterMovement()->MaxAcceleration = 10000;
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
 	GetCharacterMovement()->GravityScale = 1.0f;
 
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);

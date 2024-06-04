@@ -6,6 +6,14 @@
 #include "Engine/DataTable.h"
 #include "ParameterStructs.generated.h"
 
+UENUM(BlueprintType)
+enum class EBOOST_TYPE : uint8
+{
+    NORMAL = 0      UMETA(DisplayName = "通常ブースト"),
+    HOVER           UMETA(DisplayName = "ホバー"),
+    TANK            UMETA(DisplayName = "タンクブースト")
+};
+
 // キャラクターのステータスパラメータ構造体
 USTRUCT(BlueprintType)
 struct FCharacterStatusParameter
@@ -28,14 +36,23 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ブーストチャージ"))
     int32 BoostCharge;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ブーストタイプ"))
+    TEnumAsByte<EBOOST_TYPE> BoostType;
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
     int32 MaxDownPoint;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高速度"))
     int32 MaxSpeed;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高歩行速度"))
+    int32 MaxWalkSpeed;
+    
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高加速度"))
     int32 MaxAcceleration;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "歩行時最高加速度"))
+    int32 MaxWalkAcceleration;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "緊急帰投"))
     int32 ReturnValue;
@@ -75,6 +92,9 @@ struct FCharacterStatusParameter_TableRow : public FTableRowBase
     GENERATED_USTRUCT_BODY()
 
 public:
+    FCharacterStatusParameter_TableRow();
+
+public:
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "機体ID"))
     int32 MachineID;
 
@@ -87,14 +107,23 @@ public:
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブーストチャージ"))
     int32 BoostCharge;
 
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブーストタイプ"))
+    TEnumAsByte<EBOOST_TYPE> BoostType;
+
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
     int32 MaxDownPoint;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高速度"))
     int32 MaxSpeed;
 
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高歩行速度"))
+    int32 MaxWalkSpeed;
+
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高加速度"))
     int32 MaxAcceleration;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "歩行時最高加速度"))
+    int32 MaxWalkAcceleration;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "緊急帰投"))
     int32 ReturnValue;

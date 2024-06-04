@@ -34,11 +34,11 @@ void UCharacterStatusDataAsset::Build()
 
     TArray<UPackage*> PackagesToSave;
 
-    // データテーブルをリインポート
-    if (FReimportManager::Instance()->Reimport(DataTable, false, true))
-    {
-        PackagesToSave.Add(DataTable->GetOutermost());
-    }
+    //// データテーブルをリインポート
+    //if (FReimportManager::Instance()->Reimport(DataTable, false, true))
+    //{
+    //    PackagesToSave.Add(DataTable->GetOutermost());
+    //}
 
     CharacterParameterMap.Empty();
 
@@ -56,8 +56,10 @@ void UCharacterStatusDataAsset::Build()
         CharacterParameter.MaxSpeed                 = TableRow->MaxSpeed;
         CharacterParameter.MaxBoostCap              = TableRow->MaxBoostCap;
         CharacterParameter.BoostCharge              = TableRow->BoostCharge;
+        CharacterParameter.BoostType                = TableRow->BoostType;
         CharacterParameter.MaxDownPoint             = TableRow->MaxDownPoint;
         CharacterParameter.MaxAcceleration          = TableRow->MaxAcceleration;
+        CharacterParameter.MaxWalkAcceleration      = TableRow->MaxWalkAcceleration;
         CharacterParameter.ReturnValue              = TableRow->ReturnValue;
         CharacterParameter.MachineCost              = TableRow->MachineCost;
         CharacterParameter.DamageCutRate_Bullet     = TableRow->DamageCutRate_Bullet;

@@ -26,6 +26,17 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// ステータスパラメータの取得
+	FCharacterStatusParameter GetStatusParameter()
+	{
+		return StatusParameter;
+	}
+
+public:
+	// パラメータのセットアップ
+	// @param			InMachineID		機体ID
+	void SetupParameter(int32 InMachineID);
+
 protected:
 	// 現在のHP
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "現在のHP"))
@@ -48,7 +59,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大ダウンポイント"))
 	int32 MaxDownPoint;
 
-public:
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "CharacterStatus")
 	FCharacterStatusParameter StatusParameter;
 

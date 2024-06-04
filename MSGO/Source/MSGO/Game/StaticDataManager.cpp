@@ -5,8 +5,14 @@ class UCharacterStatusDataAsset* UStaticDataManager::GetCharacterParameterDataAs
 {
     UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
     if (World == nullptr)
+    {
         return nullptr;
-
+    }
+        
+    if (!Cast<UMSGOGameInstance>(World->GetGameInstance()))
+    {
+        return nullptr;
+    }
     // ゲームインスタンスからStaticDataManagerのインスタンスを取得
     UStaticDataManager* StaticDataManager = Cast<UMSGOGameInstance>(World->GetGameInstance())->StaticDataManager;
 
