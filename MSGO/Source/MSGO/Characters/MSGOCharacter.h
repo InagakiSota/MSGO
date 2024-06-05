@@ -150,6 +150,8 @@ protected:
 	// 移動終了
 	void EndMove();
 
+	void InputMove(const FVector2D& Input);
+
 	// 視点操作
 	void Look(const FInputActionValue& Value);
 
@@ -157,6 +159,8 @@ protected:
 	void OnPressDash();
 	// ダッシュ　リリース
 	void OnReleaseDash();
+	// ダッシュ　入力中
+	void UpdateDash();
 
 	// ジャンプ　入力
 	void OnPressJump();

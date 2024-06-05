@@ -110,6 +110,7 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		// ダッシュ
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressDash);
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AMSGOCharacter::OnReleaseDash);
+		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AMSGOCharacter::UpdateDash);
 
 
 		// ジャンプ
@@ -127,12 +128,7 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 
 	if ((Controller != nullptr) && (MoveInput.Length() > 0.0f))
 	{	
-		RotToCamera(YawRotSpeed);
-
-		MoveInput.Normalize();
-		FVector2D inputDir = MoveInput.GetRotated(Controller->GetControlRotation().Yaw);
-
-		AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
+		InputMove(MoveInput);
 	}
 }
 
@@ -143,28 +139,40 @@ void AMSGOCharacter::EndMove()
 
 	if (MoveType == EMOVE_TYPE::Dash)
 	{
-		OnReleaseDash();
+		//OnReleaseDash();
 	}
+}
+
+void AMSGOCharacter::InputMove(const FVector2D& Input)
+{
+	FVector2D inputTemp = Input;
+
+	RotToCamera(YawRotSpeed);
+
+	inputTemp.Normalize();
+	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
+
+	AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
 
 }
 
 // ダッシュ　入力
 void AMSGOCharacter::OnPressDash()
 {
-	if (MoveInput.Length() > 0.0f)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
-		GetCharacterMovement()->MaxFlySpeed = MaxSpeed;
-		GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
-		GetCharacterMovement()->GravityScale = 0.0;
+	GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
+	GetCharacterMovement()->MaxFlySpeed = MaxSpeed;
+	GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
+	GetCharacterMovement()->GravityScale = 0.0;
 
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 
-		// 移動タイプをダッシュにする
-		MoveType = EMOVE_TYPE::Dash;
-	}
-	
+	// 移動タイプをダッシュにする
+	MoveType = EMOVE_TYPE::Dash;
+
+	StatusComponent->BeginBoostDash();
+
 }
+
 // ダッシュ　リリース
 void AMSGOCharacter::OnReleaseDash()
 {
@@ -177,6 +185,18 @@ void AMSGOCharacter::OnReleaseDash()
 
 	// 移動タイプを歩行に戻す
 	MoveType = EMOVE_TYPE::Walk;
+
+	StatusComponent->EndBoostDash();
+}
+
+// ダッシュ 入力中
+void AMSGOCharacter::UpdateDash()
+{
+	if (MoveInput.Length() <= 0.0f)
+	{
+		InputMove(FVector2D(1.0f, 0.0f));
+	}
+
 }
 
 // ジャンプ　入力

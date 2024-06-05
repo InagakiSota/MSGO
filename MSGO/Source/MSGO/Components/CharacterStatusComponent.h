@@ -7,7 +7,17 @@
 #include "Structs/ParameterStructs.h"
 #include "CharacterStatusComponent.generated.h"
 
+class AMSGOCharacter;
 
+// ブースト計算用クラス
+UCLASS()
+class MSGO_API UBoostCalculator : public UObject
+{
+	GENERATED_BODY()
+
+public:
+
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MSGO_API UCharacterStatusComponent : public UActorComponent
@@ -27,15 +37,27 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// ステータスパラメータの取得
+	UFUNCTION(BlueprintCallable)
 	FCharacterStatusParameter GetStatusParameter()
 	{
 		return StatusParameter;
 	}
 
-public:
+	// 所有者の取得
+	UFUNCTION(BlueprintCallable)
+	AMSGOCharacter* GetOwnerCharacter()
+	{
+		return OwnerCharacter;
+	}
+
 	// パラメータのセットアップ
 	// @param			InMachineID		機体ID
 	void SetupParameter(int32 InMachineID);
+
+	// ブーストダッシュの開始
+	void BeginBoostDash();
+	// ブーストダッシュ終了
+	void EndBoostDash();
 
 protected:
 	// 現在のHP
@@ -58,6 +80,13 @@ protected:
 	// 最大ダウンポイント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大ダウンポイント"))
 	int32 MaxDownPoint;
+
+	// コンポーネント所有者の参照
+	UPROPERTY()
+	TObjectPtr<AMSGOCharacter> OwnerCharacter;
+
+	// ダッシュ中のフラグ
+	bool bIsCurrentDash;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "CharacterStatus")
