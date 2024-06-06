@@ -5,6 +5,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Game/StaticDataManager.h"
 #include "Characters/MSGOCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UCharacterStatusComponent::UCharacterStatusComponent()
@@ -16,12 +17,13 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	, MaxDownPoint(0)
 	, OwnerCharacter(nullptr)
 	, bIsCurrentDash(false)
+	, bIsOverHeat(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	
+	BeginChargeTimerWithOverHeat = 0.0f;
 }
 
 
@@ -35,6 +37,14 @@ void UCharacterStatusComponent::BeginPlay()
 
 }
 
+void UCharacterStatusComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	OnOverHeatDelegate.RemoveAll(this);
+}
+
+
 
 // Called every frame
 void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,8 +53,47 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	if (bIsCurrentDash)
 	{
-		NowBoostCap--;
+		NowBoostCap-=5;
+		if (NowBoostCap <= 0 && !bIsOverHeat)
+		{
+			// 登録されていればデリゲートを実行
+			if (OnOverHeatDelegate.IsBound())
+			{
+				OnOverHeatDelegate.Broadcast();
+			}
+
+			bIsOverHeat = true;
+			bIsCurrentDash = false;
+		}
 	}
+
+	// ブースト消費がされておらずキャラクターが接地していればブースト回復
+	if (PrevBoostCap == NowBoostCap && NowBoostCap != MaxBoostCap && !OwnerCharacter->GetCharacterMovement()->IsFalling())
+	{
+		if (bIsOverHeat)
+		{
+			BeginChargeTimerWithOverHeat += DeltaTime;
+
+			if (BeginChargeTimerWithOverHeat < 2.0)
+			{
+				return;
+			}
+		}
+
+		NowBoostCap += 5;
+		if (NowBoostCap >= MaxBoostCap)
+		{
+			NowBoostCap = MaxBoostCap;
+			// オーバーヒートフラグが立っていたら下げる
+			if (bIsOverHeat)
+			{
+				bIsOverHeat = false;
+				BeginChargeTimerWithOverHeat = 0.0f;
+			}
+		}
+	}
+
+	PrevBoostCap = NowBoostCap;
 
 	UKismetSystemLibrary::PrintString(this, FString::FromInt(NowBoostCap), true, true, FLinearColor::Red, 0.0166);
 	// ...

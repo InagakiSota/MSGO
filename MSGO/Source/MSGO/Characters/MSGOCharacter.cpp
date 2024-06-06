@@ -70,6 +70,9 @@ void AMSGOCharacter::BeginPlay()
 	//UKismetSystemLibrary::PrintString(this, "MSGOCharacter:BeginPlay");
 
 	StatusComponent->SetupParameter(MachineID);
+	
+	// オーバーヒート時の処理をバインド
+	StatusComponent->OnOverHeatDelegate.AddUObject(this, &AMSGOCharacter::OnOverHeat);
 
 	// ステータスコンポーネントから速度を取得してくる
 	FCharacterStatusParameter statusParam = StatusComponent->GetStatusParameter();
@@ -111,7 +114,6 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressDash);
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Completed, this, &AMSGOCharacter::OnReleaseDash);
 		enhancedInput->BindAction(IA_Dash, ETriggerEvent::Triggered, this, &AMSGOCharacter::UpdateDash);
-
 
 		// ジャンプ
 		enhancedInput->BindAction(IA_Jump, ETriggerEvent::Started, this, &AMSGOCharacter::OnPressJump);
@@ -159,6 +161,12 @@ void AMSGOCharacter::InputMove(const FVector2D& Input)
 // ダッシュ　入力
 void AMSGOCharacter::OnPressDash()
 {
+	// オーバーヒート中は処理しない
+	if (StatusComponent->GetIsOverHeat())
+	{
+		return;
+	}
+
 	GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
 	GetCharacterMovement()->MaxFlySpeed = MaxSpeed;
 	GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
@@ -176,22 +184,23 @@ void AMSGOCharacter::OnPressDash()
 // ダッシュ　リリース
 void AMSGOCharacter::OnReleaseDash()
 {
-	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxFlySpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
-	GetCharacterMovement()->GravityScale = 1.0f;
+	if (StatusComponent->GetIsOverHeat())
+	{
+		return;
+	}
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
-	// 移動タイプを歩行に戻す
-	MoveType = EMOVE_TYPE::Walk;
-
-	StatusComponent->EndBoostDash();
+	EndDash();
 }
 
 // ダッシュ 入力中
 void AMSGOCharacter::UpdateDash()
 {
+	// オーバーヒート中は処理しない
+	if (StatusComponent->GetIsOverHeat() || MoveType != EMOVE_TYPE::Dash)
+	{
+		return;
+	}
+
 	if (MoveInput.Length() <= 0.0f)
 	{
 		InputMove(FVector2D(1.0f, 0.0f));
@@ -222,6 +231,12 @@ void AMSGOCharacter::OnReleaseJump()
 // ジャンプ　入力中
 void AMSGOCharacter::UpdateJump()
 {
+	// オーバーヒート中は処理しない
+	if (StatusComponent->GetIsOverHeat())
+	{
+		return;
+	}
+
 	// 落下時にジャンプボタンを推している場合はホバリングする
 	if (MoveType == EMOVE_TYPE::Walk)
 	{
@@ -241,6 +256,29 @@ void AMSGOCharacter::UpdateJump()
 
 	}
 }
+
+// ダッシュ終了処理
+void AMSGOCharacter::EndDash()
+{
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
+	GetCharacterMovement()->GravityScale = 1.0f;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	// 移動タイプを歩行に戻す
+	MoveType = EMOVE_TYPE::Walk;
+
+	StatusComponent->EndBoostDash();
+}
+
+// オーバーヒート時の処理
+void AMSGOCharacter::OnOverHeat()
+{
+	EndDash();
+}
+
 
 
 // 視点操作

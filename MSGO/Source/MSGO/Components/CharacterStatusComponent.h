@@ -24,13 +24,18 @@ class MSGO_API UCharacterStatusComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+
+	DECLARE_MULTICAST_DELEGATE(FOnOverHeatDelegate);
+
 	// Sets default values for this component's properties
 	UCharacterStatusComponent();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 public:	
 	// Called every frame
@@ -56,8 +61,19 @@ public:
 
 	// ブーストダッシュの開始
 	void BeginBoostDash();
+	
 	// ブーストダッシュ終了
 	void EndBoostDash();
+
+	// オーバーヒートの取得
+	UFUNCTION(BlueprintPure)
+	bool GetIsOverHeat()
+	{
+		return bIsOverHeat;
+	}
+
+public:
+	FOnOverHeatDelegate OnOverHeatDelegate;
 
 protected:
 	// 現在のHP
@@ -87,6 +103,15 @@ protected:
 
 	// ダッシュ中のフラグ
 	bool bIsCurrentDash;
+	// オーバーヒートフラグ
+	bool bIsOverHeat;
+
+	// 前フレームのブースト容量
+	int32 PrevBoostCap;
+
+private:
+	// オーバーヒート時のチャージが開始されるまでのタイマー
+	float BeginChargeTimerWithOverHeat;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "CharacterStatus")

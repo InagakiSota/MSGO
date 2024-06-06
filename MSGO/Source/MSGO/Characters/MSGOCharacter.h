@@ -41,6 +41,7 @@ public:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
 	float TurnRateGamepad;
@@ -102,6 +103,10 @@ protected:
 	// InputAction:武器切り替え　前
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_ChangeWeaponPrev;
+
+	// InputAction:緊急回避
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* IA_Avoid;
 
 	// InputAction:視点操作
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -169,6 +174,11 @@ protected:
 	// ジャンプ　入力中
 	void UpdateJump();
 
+	// ダッシュ終了処理
+	void EndDash();
+	
+	// オーバーヒート時の処理
+	void OnOverHeat();
 
 protected:
 	// APawn interface
