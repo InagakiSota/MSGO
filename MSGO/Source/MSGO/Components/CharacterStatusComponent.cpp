@@ -53,7 +53,7 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	if (bIsCurrentDash)
 	{
-		NowBoostCap-=5;
+		NowBoostCap-=1;
 		if (NowBoostCap <= 0 && !bIsOverHeat)
 		{
 			// 登録されていればデリゲートを実行
@@ -80,7 +80,7 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 			}
 		}
 
-		NowBoostCap += 5;
+		NowBoostCap += 1;
 		if (NowBoostCap >= MaxBoostCap)
 		{
 			NowBoostCap = MaxBoostCap;
@@ -115,6 +115,7 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 void UCharacterStatusComponent::BeginBoostDash()
 {
 	bIsCurrentDash = true;
+	NowBoostCap -= 20;
 }
 // ブーストダッシュ終了
 void UCharacterStatusComponent::EndBoostDash()
