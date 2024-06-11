@@ -18,6 +18,15 @@ enum class EMOVE_TYPE : uint8
 	Dash,		// 走行
 };
 
+// ブースト速度のステータス
+UENUM()
+enum class EBOOST_SPEED_STATUS : uint8
+{
+	InitSpeed,		// 初速
+	MaxSpeed,		// 最高速度
+	CrusingSpeed,	// 巡航速度
+};
+
 class UCharacterStatusComponent;
 
 UCLASS(config=Game)
@@ -148,6 +157,14 @@ private:
 	// 歩行時最高加速度
 	int32 MaxWalkAcceleration;
 
+	// ブースト移動時のタイマー
+	float BoostMoveTimer;
+	// ブースト移動のターゲット秒数
+	float TargetSeconds;
+
+	// ブースト速度のステータス
+	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
+
 protected:
 	// 移動処理
 	void Move(const FInputActionValue& Value);
@@ -186,10 +203,13 @@ protected:
 	// End of APawn interface
 
 	// キャラクターステータスコンポーネントの取得
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UCharacterStatusComponent* GetCharacterStatusComponent()
 	{
 		return StatusComponent;
 	}
+
+
 
 public:
 	/** Returns CameraBoom subobject **/

@@ -10,8 +10,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Components/CharacterStatusComponent.h"
 #include "Structs/ParameterStructs.h"
+#include "Utility/MSGOBlueprintFunctionLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
@@ -55,6 +57,11 @@ AMSGOCharacter::AMSGOCharacter()
 	DashRiseSpeed = 1.f;
 
 	PrevMoveInput = TempMoveInput = FVector2D(0.0f,0.0f);
+
+	BoostMoveTimer = 0.0f;
+	TargetSeconds = 0.0f;
+
+	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
 
 	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
@@ -167,9 +174,10 @@ void AMSGOCharacter::OnPressDash()
 		return;
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = MaxSpeed;
-	GetCharacterMovement()->MaxFlySpeed = MaxSpeed;
-	GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
+	// 初速を代入
+	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().InitSpeed;
+	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().InitSpeed;
+	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
 	GetCharacterMovement()->GravityScale = 0.0;
 
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
@@ -178,6 +186,10 @@ void AMSGOCharacter::OnPressDash()
 	MoveType = EMOVE_TYPE::Dash;
 
 	StatusComponent->BeginBoostDash();
+
+	// 最高速度に移行するまでの秒数を算出
+	TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_MaxSpeed);
+
 
 }
 
@@ -200,13 +212,87 @@ void AMSGOCharacter::UpdateDash()
 	{
 		return;
 	}
-
+	
+	// ニュートラル時の移動処理
 	if (MoveInput.Length() <= 0.0f)
 	{
 		InputMove(FVector2D(1.0f, 0.0f));
 	}
 
+	BoostMoveTimer += this->GetWorld()->DeltaTimeSeconds;
+	float targetSeconds = 0.0f;
+	float targetSecondsRate = BoostMoveTimer / TargetSeconds;
+	float moveSpeed = 0.0f;
+
+	switch (NowBoostSpeedStatus)
+	{
+	// 初速
+	case EBOOST_SPEED_STATUS::InitSpeed:
+		moveSpeed = UKismetMathLibrary::Lerp(StatusComponent->GetStatusParameter().InitSpeed, StatusComponent->GetStatusParameter().MaxSpeed, targetSecondsRate);
+		
+		if (targetSecondsRate >= 1.0f)
+		{
+			BoostMoveTimer = 0.0f;
+			// 最高速度維持フレームを算出
+			TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().SustainedFrame_MaxSpeed);
+
+			NowBoostSpeedStatus = EBOOST_SPEED_STATUS::MaxSpeed;
+		}
+		break;
+	// 最高速度
+	case EBOOST_SPEED_STATUS::MaxSpeed:
+		moveSpeed = StatusComponent->GetStatusParameter().MaxSpeed;
+
+		if (targetSecondsRate >= 1.0f)
+		{
+			BoostMoveTimer = 0.0f;
+			// 巡航速度移行フレームを算出
+			TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_CrusingSpeed);
+
+			NowBoostSpeedStatus = EBOOST_SPEED_STATUS::CrusingSpeed;
+
+		}
+
+		break;
+	case EBOOST_SPEED_STATUS::CrusingSpeed:
+		// 巡航速度に移行したらそのまま維持
+		if (targetSecondsRate >= 1.0f)
+		{
+			targetSecondsRate = 1.0f;
+		}
+
+		moveSpeed = UKismetMathLibrary::Lerp(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate);
+
+
+
+		break;
+	default:
+		break;
+
+	}
+
+	UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
+	GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxFlySpeed = moveSpeed;
 }
+
+// ダッシュ終了処理
+void AMSGOCharacter::EndDash()
+{
+	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxWalkAcceleration;
+	GetCharacterMovement()->GravityScale = 1.0f;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	// 移動タイプを歩行に戻す
+	MoveType = EMOVE_TYPE::Walk;
+
+	StatusComponent->EndBoostDash();
+	BoostMoveTimer = 0.f;
+	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
+}
+
 
 // ジャンプ　入力
 void AMSGOCharacter::OnPressJump()
@@ -257,21 +343,6 @@ void AMSGOCharacter::UpdateJump()
 	}
 }
 
-// ダッシュ終了処理
-void AMSGOCharacter::EndDash()
-{
-	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxFlySpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
-	GetCharacterMovement()->GravityScale = 1.0f;
-
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
-	// 移動タイプを歩行に戻す
-	MoveType = EMOVE_TYPE::Walk;
-
-	StatusComponent->EndBoostDash();
-}
 
 // オーバーヒート時の処理
 void AMSGOCharacter::OnOverHeat()

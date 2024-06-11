@@ -58,6 +58,12 @@ void UCharacterStatusDataAsset::Build()
         CharacterParameter.BoostCharge              = TableRow->BoostCharge;
         CharacterParameter.BoostType                = TableRow->BoostType;
         CharacterParameter.MaxDownPoint             = TableRow->MaxDownPoint;
+        CharacterParameter.MaxSpeed                 = TableRow->MaxSpeed;
+        CharacterParameter.InitSpeed                = TableRow->InitSpeed;
+        CharacterParameter.CrusingSpeed             = TableRow->CrusingSpeed;
+        CharacterParameter.SustainedFrame_MaxSpeed  = TableRow->SustainedFrame_MaxSpeed;
+        CharacterParameter.TransitionFrame_CrusingSpeed = TableRow->TransitionFrame_CrusingSpeed;
+        CharacterParameter.TransitionFrame_MaxSpeed = TableRow->TransitionFrame_MaxSpeed;
         CharacterParameter.MaxAcceleration          = TableRow->MaxAcceleration;
         CharacterParameter.MaxWalkAcceleration      = TableRow->MaxWalkAcceleration;
         CharacterParameter.ReturnValue              = TableRow->ReturnValue;
@@ -69,7 +75,11 @@ void UCharacterStatusDataAsset::Build()
         CharacterParameter.AssistModuleSlotNum      = TableRow->AssistModuleSlotNum;
         CharacterParameter.JumpRiseHeight           = TableRow->JumpRiseHeight;
         CharacterParameter.JumpRiseSpeed            = TableRow->JumpRiseSpeed;
-        CharacterParameter.BoostConsumption_Avoidance = TableRow->BoostConsumption_Avoidance;
+        CharacterParameter.BoostGaugeDecrement_Avoidance = TableRow->BoostGaugeDecrement_Avoidance;
+        CharacterParameter.BoostGaugeDecrement_BeginBoostDash = TableRow->BoostGaugeDecrement_BeginBoostDash;
+        CharacterParameter.BoostGaugeDecrement_BoostDash = TableRow->BoostGaugeDecrement_BoostDash;
+        CharacterParameter.BoostGaugeIncrement_Normal = TableRow->BoostGaugeIncrement_Normal;
+        CharacterParameter.BoostGaugeIncrement_OverHeat = TableRow->BoostGaugeIncrement_OverHeat;
 
         // Mapに追加する
         CharacterParameterMap.Add(TableRow->MachineID, CharacterParameter);

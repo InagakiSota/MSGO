@@ -24,65 +24,122 @@ public:
     FCharacterStatusParameter();
 
 public:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "機体名"))
+    // 機体名
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     FName MachineName;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大HP"))
+    // 最大HP
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxHP;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ブースト容量"))
+    // ブースト容量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxBoostCap;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ブーストチャージ"))
+    // ブーストチャージ性能
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 BoostCharge;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ブーストタイプ"))
+    // ブーストタイプ
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     TEnumAsByte<EBOOST_TYPE> BoostType;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
+    // ダウンポイント
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxDownPoint;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高速度"))
-    int32 MaxSpeed;
+    // ブースト初速
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 InitSpeed;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高歩行速度"))
+    // 最高速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 MaxSpeed;
+    
+    // 巡航速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 CrusingSpeed;
+
+    // 最高速度移行フレーム
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 TransitionFrame_MaxSpeed;
+
+    // 最高速度維持フレーム
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 SustainedFrame_MaxSpeed;
+
+    // 巡航速度移行フレーム
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 TransitionFrame_CrusingSpeed;
+
+    // 最高歩行速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxWalkSpeed;
     
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最高加速度"))
+    // 最高加速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxAcceleration;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "歩行時最高加速度"))
+    // 歩行時最高加速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MaxWalkAcceleration;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "緊急帰投"))
+    // 緊急帰投
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 ReturnValue;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "機体コスト"))
+    // 機体コスト
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 MachineCost;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダメージカット率　実弾"))
+    // ダメージカット率　実弾
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     float DamageCutRate_Bullet;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダメージカット率　爆発"))
+    // ダメージカット率　爆発
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     float DamageCutRate_Bomb;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダメージカット率　ビーム"))
+    // ダメージカット率　ビーム
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     float DamageCutRate_Beam;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダメージカット率　格闘"))
+    // ダメージカット率　格闘
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     float DamageCutRate_Combat;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "バトルアシストモジュール　スロット数"))
+    // バトルアシストモジュール　スロット数
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 AssistModuleSlotNum;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ジャンプ　上昇高度"))
+    // ジャンプ　上昇高度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 JumpRiseHeight;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ジャンプ　上昇速度"))
+    // ジャンプ　上昇速度
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 JumpRiseSpeed;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "緊急回避　ブースト消費量"))
-    int32 BoostConsumption_Avoidance;
+    // ブースト移動開始時のブーストゲージ減少量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeDecrement_BeginBoostDash;
+
+    // ブースト移動時の1フレームあたりのブーストゲージ減少量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeDecrement_BoostDash;
+
+    // 通常時の1フレームあたりのブーストゲージの上昇量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeIncrement_Normal;
+
+    // オーバーヒート時の1フレームあたりのブーストゲージの上昇量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeIncrement_OverHeat;
+
+
+    // 緊急回避　ブースト消費量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeDecrement_Avoidance;
 };
 
 // キャラクターのステータスパラメータ構造体(データテーブル用)
@@ -113,8 +170,23 @@ public:
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
     int32 MaxDownPoint;
 
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブースト初速"))
+    int32 InitSpeed;
+
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高速度"))
     int32 MaxSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "巡航速度"))
+    int32 CrusingSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高速度移行フレーム"))
+    int32 TransitionFrame_MaxSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高速度維持フレーム"))
+    int32 SustainedFrame_MaxSpeed;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "巡航速度移行フレーム"))
+    int32 TransitionFrame_CrusingSpeed;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "最高歩行速度"))
     int32 MaxWalkSpeed;
@@ -124,6 +196,7 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "歩行時最高加速度"))
     int32 MaxWalkAcceleration;
+
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "緊急帰投"))
     int32 ReturnValue;
@@ -152,6 +225,18 @@ public:
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ジャンプ　上昇速度"))
     int32 JumpRiseSpeed;
 
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブースト移動開始時のブーストゲージ減少量"))
+    int32 BoostGaugeDecrement_BeginBoostDash;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブースト移動時の1フレームあたりのブーストゲージ減少量"))
+    int32 BoostGaugeDecrement_BoostDash;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "通常時の1フレームあたりのブーストゲージの上昇量"))
+    int32 BoostGaugeIncrement_Normal;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "オーバーヒート時の1フレームあたりのブーストゲージの上昇量"))
+    int32 BoostGaugeIncrement_OverHeat;
+
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "緊急回避　ブースト消費量"))
-    int32 BoostConsumption_Avoidance;
+    int32 BoostGaugeDecrement_Avoidance;
 };
