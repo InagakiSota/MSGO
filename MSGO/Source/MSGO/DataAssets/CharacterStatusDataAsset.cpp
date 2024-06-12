@@ -80,7 +80,7 @@ void UCharacterStatusDataAsset::Build()
         CharacterParameter.BoostGaugeDecrement_BoostDash = TableRow->BoostGaugeDecrement_BoostDash;
         CharacterParameter.BoostGaugeIncrement_Normal = TableRow->BoostGaugeIncrement_Normal;
         CharacterParameter.BoostGaugeIncrement_OverHeat = TableRow->BoostGaugeIncrement_OverHeat;
-
+        CharacterParameter.BeginBoostChargeFrame    = TableRow->BeginBoostChargeFrame;
         // Mapに追加する
         CharacterParameterMap.Add(TableRow->MachineID, CharacterParameter);
 

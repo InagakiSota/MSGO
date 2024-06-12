@@ -32,6 +32,7 @@ FCharacterStatusParameter::FCharacterStatusParameter()
     , BoostGaugeIncrement_Normal(10)
     , BoostGaugeIncrement_OverHeat(5)
     , BoostGaugeDecrement_Avoidance(100)
+    , BeginBoostChargeFrame(120)
 
 {
 }
@@ -65,6 +66,7 @@ FCharacterStatusParameter_TableRow::FCharacterStatusParameter_TableRow()
     , BoostGaugeIncrement_Normal(10)
     , BoostGaugeIncrement_OverHeat(5)
     , BoostGaugeDecrement_Avoidance(100)
+    , BeginBoostChargeFrame(120)
 {
 
 }

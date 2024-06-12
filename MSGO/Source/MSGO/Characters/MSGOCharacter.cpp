@@ -228,7 +228,7 @@ void AMSGOCharacter::UpdateDash()
 	{
 	// 初速
 	case EBOOST_SPEED_STATUS::InitSpeed:
-		moveSpeed = UKismetMathLibrary::Lerp(StatusComponent->GetStatusParameter().InitSpeed, StatusComponent->GetStatusParameter().MaxSpeed, targetSecondsRate);
+		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().InitSpeed, StatusComponent->GetStatusParameter().MaxSpeed, targetSecondsRate, EEasingFunc::EaseIn);
 		
 		if (targetSecondsRate >= 1.0f)
 		{
@@ -261,9 +261,7 @@ void AMSGOCharacter::UpdateDash()
 			targetSecondsRate = 1.0f;
 		}
 
-		moveSpeed = UKismetMathLibrary::Lerp(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate);
-
-
+		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate, EEasingFunc::EaseOut);
 
 		break;
 	default:

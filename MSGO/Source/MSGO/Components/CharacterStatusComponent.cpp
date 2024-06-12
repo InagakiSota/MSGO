@@ -6,6 +6,98 @@
 #include "Game/StaticDataManager.h"
 #include "Characters/MSGOCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Utility/MSGOBlueprintFunctionLibrary.h"
+
+UBoostCalculator::UBoostCalculator()
+	: NowBoostState(EBOOST_STATE::None)
+{
+
+}
+
+TStatId UBoostCalculator::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(UMyGameInstanceSubsystem, STATGROUP_Tickables);
+}
+
+void UBoostCalculator::Tick(float DeltaTime)
+{
+	//UE_LOG(LogTemp, Log, TEXT("DeltaTime=%f"), DeltaTime);
+
+	// ブースト容量の計算
+	CalcNowBoostCap(DeltaTime);
+}
+
+// 現在のブースト容量の計算
+void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
+{
+	// ブーストダッシュ中はゲージを減らす
+	if (NowBoostState == EBOOST_STATE::BeginBoostDash)
+	{
+		NowBoostCap -= StatusParam.BoostGaugeDecrement_BoostDash;
+
+		// ブーストゲージが0になったらオーバーヒートフラグを立てる
+		if (NowBoostCap <= 0 && NowBoostState != EBOOST_STATE::OverHeat)
+		{
+			NowBoostState = EBOOST_STATE::OverHeat;
+		}
+	}
+
+	// ブースト消費がされておらずキャラクターが接地していればブースト回復
+	if (PrevBoostCap == NowBoostCap && NowBoostCap != StatusParam.MaxBoostCap && !OwnerCharacter->GetCharacterMovement()->IsFalling())
+	{
+		// オーバーヒート中は一定時間経過するまで回復しない
+		if (NowBoostState == EBOOST_STATE::OverHeat)
+		{
+			BeginChargeTimerWithOverHeat += DeltaTime;
+
+			if (BeginChargeTimerWithOverHeat < UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusParam.BeginBoostChargeFrame))
+			{
+				return;
+			}
+		}
+
+		// ブーストゲージを回復させる
+		NowBoostCap += NowBoostState != EBOOST_STATE::OverHeat ? StatusParam.BoostGaugeIncrement_Normal : StatusParam.BoostGaugeIncrement_OverHeat;
+
+		if (NowBoostCap >= StatusParam.MaxBoostCap)
+		{
+			NowBoostCap = StatusParam.MaxBoostCap;
+			// オーバーヒートフラグが立っていたら下げる
+			if (NowBoostState == EBOOST_STATE::OverHeat)
+			{
+				NowBoostState = EBOOST_STATE::None;
+				BeginChargeTimerWithOverHeat = 0.0f;
+			}
+		}
+	}
+
+	PrevBoostCap = NowBoostCap;
+
+}
+
+// ブーストダッシュ開始
+void UBoostCalculator::BeginBoostDash()
+{
+	NowBoostState = EBOOST_STATE::BeginBoostDash;
+	NowBoostCap -= StatusParam.BoostGaugeDecrement_BeginBoostDash;
+
+}
+// ブーストダッシュ終了
+void UBoostCalculator::EndBoostDash()
+{
+	if (NowBoostState != EBOOST_STATE::OverHeat)
+	{
+		NowBoostState = EBOOST_STATE::None;
+	}
+}
+
+// ステータスパラメータのセットアップ
+void UBoostCalculator::SetupStatusParam(const FCharacterStatusParameter& InStatusParam)
+{
+	StatusParam = InStatusParam;
+	NowBoostCap = StatusParam.MaxBoostCap;
+}
+
 
 // Sets default values for this component's properties
 UCharacterStatusComponent::UCharacterStatusComponent()
@@ -16,15 +108,14 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	, NowDownPoint(0)
 	, MaxDownPoint(0)
 	, OwnerCharacter(nullptr)
-	, bIsCurrentDash(false)
-	, bIsOverHeat(false)
+	, bIsBroadcastDelegate(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	BeginChargeTimerWithOverHeat = 0.0f;
 }
+
 
 
 // Called when the game starts
@@ -34,6 +125,12 @@ void UCharacterStatusComponent::BeginPlay()
 
 	// 所有者を取得
 	OwnerCharacter = Cast<AMSGOCharacter>(GetOwner());
+	check(OwnerCharacter);
+
+	BoostCalculator = NewObject<UBoostCalculator>();
+	check(BoostCalculator);
+
+	BoostCalculator->SetOwnerCharacter(OwnerCharacter);
 
 }
 
@@ -51,52 +148,19 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bIsCurrentDash)
-	{
-		NowBoostCap-= StatusParameter.BoostGaugeDecrement_BoostDash;
-		if (NowBoostCap <= 0 && !bIsOverHeat)
-		{
-			// 登録されていればデリゲートを実行
-			if (OnOverHeatDelegate.IsBound())
-			{
-				OnOverHeatDelegate.Broadcast();
-			}
+	// ブースト計算クラスからブースト容量を取得
+	NowBoostCap = BoostCalculator->GetNowBoostCap();
 
-			bIsOverHeat = true;
-			bIsCurrentDash = false;
+	// ブースト容量が0になったらデリゲートを実行
+	if (NowBoostCap <= 0 && !bIsBroadcastDelegate)
+	{
+		// 登録されていればデリゲートを実行
+		if (OnOverHeatDelegate.IsBound())
+		{
+			OnOverHeatDelegate.Broadcast();
+			bIsBroadcastDelegate = true;
 		}
 	}
-
-	// ブースト消費がされておらずキャラクターが接地していればブースト回復
-	if (PrevBoostCap == NowBoostCap && NowBoostCap != MaxBoostCap && !OwnerCharacter->GetCharacterMovement()->IsFalling())
-	{
-		if (bIsOverHeat)
-		{
-			BeginChargeTimerWithOverHeat += DeltaTime;
-
-			if (BeginChargeTimerWithOverHeat < 2.0)
-			{
-				return;
-			}
-		}
-
-		NowBoostCap += StatusParameter.BoostGaugeIncrement_Normal;
-		if (NowBoostCap >= MaxBoostCap)
-		{
-			NowBoostCap = MaxBoostCap;
-			// オーバーヒートフラグが立っていたら下げる
-			if (bIsOverHeat)
-			{
-				bIsOverHeat = false;
-				BeginChargeTimerWithOverHeat = 0.0f;
-			}
-		}
-	}
-
-	PrevBoostCap = NowBoostCap;
-
-	UKismetSystemLibrary::PrintString(this, FString::FromInt(NowBoostCap), true, true, FLinearColor::Red, 0.0166);
-	// ...
 }
 
 // パラメータのセットアップ
@@ -105,20 +169,38 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 {
 	UStaticDataManager::GetCharacterParameterData(this, InMachineID, StatusParameter);
 
+	BoostCalculator->SetupStatusParam(StatusParameter);
+
 	NowHP = MaxHP = StatusParameter.MaxHP;
-	NowBoostCap = MaxBoostCap = StatusParameter.MaxBoostCap;
 	NowDownPoint = MaxDownPoint = StatusParameter.MaxDownPoint;
+	NowBoostCap = MaxBoostCap = BoostCalculator->GetNowBoostCap();
 
 }
 
 // ブーストダッシュの開始
 void UCharacterStatusComponent::BeginBoostDash()
 {
-	bIsCurrentDash = true;
-	NowBoostCap -= StatusParameter.BoostGaugeDecrement_BeginBoostDash;
+	BoostCalculator->BeginBoostDash();
 }
 // ブーストダッシュ終了
 void UCharacterStatusComponent::EndBoostDash()
 {
-	bIsCurrentDash = false;
+	BoostCalculator->EndBoostDash();
+}
+
+bool UCharacterStatusComponent::GetIsOverHeat()
+{
+	return BoostCalculator->GetIsOverHeat();
+}
+
+
+// 現在のスピードを取得
+const int32 UCharacterStatusComponent::GetNowSpeed()
+{
+	if (BoostCalculator)
+	{
+		return BoostCalculator->GetNowBoostSpeed();
+	}
+
+	return 0;
 }

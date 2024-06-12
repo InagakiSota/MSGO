@@ -136,10 +136,13 @@ public:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 BoostGaugeIncrement_OverHeat;
 
-
     // 緊急回避　ブースト消費量
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 BoostGaugeDecrement_Avoidance;
+
+    // オーバーヒート時にブーストが回復するまでのフレーム数
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BeginBoostChargeFrame;
 };
 
 // キャラクターのステータスパラメータ構造体(データテーブル用)
@@ -239,4 +242,8 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "緊急回避　ブースト消費量"))
     int32 BoostGaugeDecrement_Avoidance;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "オーバーヒート時にブーストが回復するまでのフレーム数"))
+    int32 BeginBoostChargeFrame;
+
 };

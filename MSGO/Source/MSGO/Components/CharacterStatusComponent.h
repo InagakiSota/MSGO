@@ -5,18 +5,99 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Structs/ParameterStructs.h"
+#include "Tickable.h"
 #include "CharacterStatusComponent.generated.h"
 
 class AMSGOCharacter;
 
+
+
 // ブースト計算用クラス
 UCLASS()
-class MSGO_API UBoostCalculator : public UObject
+class MSGO_API UBoostCalculator : public UObject,public FTickableGameObject
 {
 	GENERATED_BODY()
 
 public:
+	// ブーストの状態
+	enum class EBOOST_STATE : uint8
+	{
+		None		 = 0,
+		BeginBoostDash,
+		OverHeat,
+	};
 
+	UBoostCalculator();
+
+	// FTickableGameObjectからオーバーライド
+	virtual TStatId GetStatId() const;
+	virtual bool IsTickable() const { return(true); }
+	virtual void Tick(float DeltaTime);
+
+	ETickableTickType GetTickableTickType() const
+	{
+		return IsTemplate() ? ETickableTickType::Never : ETickableTickType::Always;
+	}
+
+public:
+	// 現在のブースト容量の計算
+	void CalcNowBoostCap(float DeltaTime);
+
+	// 現在のブースト容量の取得
+	const int32 GetNowBoostCap()
+	{
+		return NowBoostCap;
+	}
+
+	// 現在のスピードの取得
+	const int32 GetNowBoostSpeed()
+	{
+		return NowBoostSpeed;
+	}
+
+	// ブーストダッシュ開始
+	void BeginBoostDash();
+	// ブーストダッシュ終了
+	void EndBoostDash();
+
+	// 所有者のセット
+	void SetOwnerCharacter(AMSGOCharacter* InOwnerCharacter)
+	{
+		OwnerCharacter = InOwnerCharacter;
+	}
+
+	// ステータスパラメータの取得
+	void SetupStatusParam(const FCharacterStatusParameter& InStatusParam);
+
+	// オーバーヒートフラグの取得
+	const bool GetIsOverHeat()
+	{
+		return NowBoostState == EBOOST_STATE::OverHeat;
+	}
+
+private:
+	// 現在のブーストの状態
+	EBOOST_STATE NowBoostState;
+
+	// 現在のブースト容量
+	int32 NowBoostCap;
+
+	// 1フレーム前のブースト容量
+	int32 PrevBoostCap;
+
+	// 現在のスピード
+	int32 NowBoostSpeed;
+
+	// 所有者の参照
+	UPROPERTY()
+	TObjectPtr<AMSGOCharacter> OwnerCharacter;
+
+	// ステータスパラメータ
+	// MEMO:ここで持っていていいかは考え中
+	FCharacterStatusParameter StatusParam;
+
+	// オーバーヒート時にブースト回復が開始する用のタイマー
+	float BeginChargeTimerWithOverHeat;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -67,10 +148,10 @@ public:
 
 	// オーバーヒートの取得
 	UFUNCTION(BlueprintPure)
-	bool GetIsOverHeat()
-	{
-		return bIsOverHeat;
-	}
+	bool GetIsOverHeat();
+
+	// 現在のスピードを取得
+	const int32 GetNowSpeed();
 
 public:
 	FOnOverHeatDelegate OnOverHeatDelegate;
@@ -101,17 +182,16 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AMSGOCharacter> OwnerCharacter;
 
-	// ダッシュ中のフラグ
-	bool bIsCurrentDash;
-	// オーバーヒートフラグ
-	bool bIsOverHeat;
+	// ブースト計算用クラス
+	UPROPERTY()
+	TObjectPtr<UBoostCalculator> BoostCalculator;
 
 	// 前フレームのブースト容量
 	int32 PrevBoostCap;
 
 private:
-	// オーバーヒート時のチャージが開始されるまでのタイマー
-	float BeginChargeTimerWithOverHeat;
+	// デリゲートを再生したかのフラグ
+	bool bIsBroadcastDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "CharacterStatus")
