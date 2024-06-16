@@ -162,6 +162,9 @@ private:
 	// ブースト移動のターゲット秒数
 	float TargetSeconds;
 
+	// 上昇開始時の高度
+	float BeginRiseHeight;
+
 	// ブースト速度のステータス
 	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
 

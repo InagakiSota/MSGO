@@ -152,15 +152,17 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	NowBoostCap = BoostCalculator->GetNowBoostCap();
 
 	// ブースト容量が0になったらデリゲートを実行
-	if (NowBoostCap <= 0 && !bIsBroadcastDelegate)
+	if (NowBoostCap <= 0 && PrevBoostCap != NowBoostCap)
 	{
 		// 登録されていればデリゲートを実行
 		if (OnOverHeatDelegate.IsBound())
 		{
 			OnOverHeatDelegate.Broadcast();
-			bIsBroadcastDelegate = true;
+			//bIsBroadcastDelegate = true;
 		}
 	}
+
+	PrevBoostCap = NowBoostCap;
 }
 
 // パラメータのセットアップ

@@ -60,6 +60,7 @@ AMSGOCharacter::AMSGOCharacter()
 
 	BoostMoveTimer = 0.0f;
 	TargetSeconds = 0.0f;
+	BeginRiseHeight = 0.0;
 
 	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
 
@@ -269,7 +270,7 @@ void AMSGOCharacter::UpdateDash()
 
 	}
 
-	UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
+	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
 	GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxFlySpeed = moveSpeed;
 }
 
@@ -321,24 +322,42 @@ void AMSGOCharacter::UpdateJump()
 		return;
 	}
 
-	// 落下時にジャンプボタンを推している場合はホバリングする
-	if (MoveType == EMOVE_TYPE::Walk)
-	{
-		FVector velocity = GetCharacterMovement()->Velocity;
+	//// 落下時にジャンプボタンを推している場合はホバリングする
+	//if (MoveType == EMOVE_TYPE::Walk)
+	//{
+	//	FVector velocity = GetCharacterMovement()->Velocity;
 
-		if (velocity.Z < 0)
-		{
-			GetCharacterMovement()->GravityScale = 0.1;
-		}
-	
-	}
-	// ダッシュ中はジャンプじゃなく上昇させる
-	else
-	{
-		FVector actorPos = FVector(0.0, 0.0, DashRiseSpeed);
-		AddActorWorldOffset(actorPos);
+	//	//if (velocity.Z < 0)
+	//	//{
+	//	//	GetCharacterMovement()->GravityScale = 0.1;
+	//	//}
+	//	UKismetSystemLibrary::PrintString(this, velocity.ToString());
 
-	}
+	//	//if (GetCharacterMovement()->IsFalling() && velocity.Z < 100.0f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
+	//	//{
+	//	//	BeginRiseHeight = GetActorLocation().Z;
+	//	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	//	//}
+
+	//	//FVector riseOffset = FVector(0.0, 0.0, DashRiseSpeed);
+	//	//AddActorWorldOffset(riseOffset);
+
+	//	//if (GetActorLocation().Z >= BeginRiseHeight)
+	//	//{
+	//	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	//	//	GetCharacterMovement()->GravityScale = 0.1f;
+
+	//	//}
+
+	//}
+	//// ダッシュ中はジャンプじゃなく上昇させる
+	//else
+	//{
+	//	FVector riseOffset = FVector(0.0, 0.0, DashRiseSpeed);
+	//	AddActorWorldOffset(riseOffset);
+
+	//}
+
 }
 
 
