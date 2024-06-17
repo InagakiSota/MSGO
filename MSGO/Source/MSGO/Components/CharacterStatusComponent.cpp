@@ -33,7 +33,7 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 	// ブーストダッシュ中はゲージを減らす
 	if (NowBoostState == EBOOST_STATE::BeginBoostDash)
 	{
-		NowBoostCap -= StatusParam.BoostGaugeDecrement_BoostDash;
+		NowBoostCap -=( StatusParam.BoostGaugeDecrement_BoostDash * DeltaTime * 100.0f);
 
 		// ブーストゲージが0になったらオーバーヒートフラグを立てる
 		if (NowBoostCap <= 0 && NowBoostState != EBOOST_STATE::OverHeat)
@@ -57,7 +57,8 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 		}
 
 		// ブーストゲージを回復させる
-		NowBoostCap += NowBoostState != EBOOST_STATE::OverHeat ? StatusParam.BoostGaugeIncrement_Normal : StatusParam.BoostGaugeIncrement_OverHeat;
+		int32 boostGainValue = NowBoostState != EBOOST_STATE::OverHeat ? StatusParam.BoostGaugeIncrement_Normal : StatusParam.BoostGaugeIncrement_OverHeat;
+		NowBoostCap += boostGainValue * DeltaTime * 100.0f;
 
 		if (NowBoostCap >= StatusParam.MaxBoostCap)
 		{

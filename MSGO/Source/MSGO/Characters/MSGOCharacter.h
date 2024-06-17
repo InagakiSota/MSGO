@@ -27,6 +27,16 @@ enum class EBOOST_SPEED_STATUS : uint8
 	CrusingSpeed,	// 巡航速度
 };
 
+// ジャンプのステータス
+UENUM(BlueprintType)
+enum class EJUMP_STATUS : uint8
+{
+	Idle,			// アイドル
+	Rising,			// 上昇中
+	Hovering,		// ホバリング
+	Falling,		// 落下中
+};
+
 class UCharacterStatusComponent;
 
 UCLASS(config=Game)
@@ -167,6 +177,9 @@ private:
 
 	// ブースト速度のステータス
 	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
+	// ジャンプのステータス
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EJUMP_STATUS NowJumpStatus;
 
 protected:
 	// 移動処理

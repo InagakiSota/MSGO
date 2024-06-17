@@ -63,7 +63,7 @@ AMSGOCharacter::AMSGOCharacter()
 	BeginRiseHeight = 0.0;
 
 	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
-
+	NowJumpStatus = EJUMP_STATUS::Idle;
 	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
 	
@@ -95,7 +95,7 @@ void AMSGOCharacter::BeginPlay()
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = MaxWalkAcceleration;
+	GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
@@ -296,21 +296,21 @@ void AMSGOCharacter::EndDash()
 // ジャンプ　入力
 void AMSGOCharacter::OnPressJump()
 {
-	if (MoveType == EMOVE_TYPE::Walk)
-	{
-		Jump();
-	}
+	//if (MoveType == EMOVE_TYPE::Walk && StatusComponent->GetIsOverHeat())
+	//{
+	//	Jump();
+	//}
 	
 }
 // ジャンプ　リリース
 void AMSGOCharacter::OnReleaseJump()
 {
-	if (MoveType == EMOVE_TYPE::Walk)
-	{
-		StopJumping();
+	//if (MoveType == EMOVE_TYPE::Walk)
+	//{
+	//	StopJumping();
 
-		GetCharacterMovement()->GravityScale = 1.0f;
-	}
+	//	GetCharacterMovement()->GravityScale = 1.0f;
+	//}
 	
 }
 // ジャンプ　入力中
