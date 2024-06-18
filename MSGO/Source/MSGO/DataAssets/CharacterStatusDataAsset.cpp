@@ -78,6 +78,7 @@ void UCharacterStatusDataAsset::Build()
         CharacterParameter.BoostGaugeDecrement_Avoidance = TableRow->BoostGaugeDecrement_Avoidance;
         CharacterParameter.BoostGaugeDecrement_BeginBoostDash = TableRow->BoostGaugeDecrement_BeginBoostDash;
         CharacterParameter.BoostGaugeDecrement_BoostDash = TableRow->BoostGaugeDecrement_BoostDash;
+        CharacterParameter.BoostGaugeDecrement_Rising = TableRow->BoostGaugeDecrement_Rising;
         CharacterParameter.BoostGaugeIncrement_Normal = TableRow->BoostGaugeIncrement_Normal;
         CharacterParameter.BoostGaugeIncrement_OverHeat = TableRow->BoostGaugeIncrement_OverHeat;
         CharacterParameter.BeginBoostChargeFrame    = TableRow->BeginBoostChargeFrame;

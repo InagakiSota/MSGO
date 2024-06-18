@@ -11,7 +11,6 @@
 class AMSGOCharacter;
 
 
-
 // ブースト計算用クラス
 UCLASS()
 class MSGO_API UBoostCalculator : public UObject,public FTickableGameObject
@@ -19,11 +18,12 @@ class MSGO_API UBoostCalculator : public UObject,public FTickableGameObject
 	GENERATED_BODY()
 
 public:
+
 	// ブーストの状態
 	enum class EBOOST_STATE : uint8
 	{
 		None		 = 0,
-		BeginBoostDash,
+		BeginBoostIgnition,
 		OverHeat,
 	};
 
@@ -55,10 +55,10 @@ public:
 		return NowBoostSpeed;
 	}
 
-	// ブーストダッシュ開始
-	void BeginBoostDash();
-	// ブーストダッシュ終了
-	void EndBoostDash();
+	// ブースト消費開始
+	void BeginBoost();
+	// ブースト消費終了
+	void EndBoost();
 
 	// 所有者のセット
 	void SetOwnerCharacter(AMSGOCharacter* InOwnerCharacter)
@@ -140,11 +140,11 @@ public:
 	// @param			InMachineID		機体ID
 	void SetupParameter(int32 InMachineID);
 
-	// ブーストダッシュの開始
-	void BeginBoostDash();
+	// ブースト消費の開始
+	void BeginBoost();
 	
-	// ブーストダッシュ終了
-	void EndBoostDash();
+	// ブースト消費終了
+	void EndBoost();
 
 	// オーバーヒートの取得
 	UFUNCTION(BlueprintPure)

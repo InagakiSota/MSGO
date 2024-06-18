@@ -31,9 +31,25 @@ void UBoostCalculator::Tick(float DeltaTime)
 void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 {
 	// ブーストダッシュ中はゲージを減らす
-	if (NowBoostState == EBOOST_STATE::BeginBoostDash)
+	if (NowBoostState == EBOOST_STATE::BeginBoostIgnition)
 	{
-		NowBoostCap -=( StatusParam.BoostGaugeDecrement_BoostDash * DeltaTime * 100.0f);
+		int32 BoostDecrement = 0;
+
+		if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash && (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering))
+		{
+			BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash + StatusParam.BoostGaugeDecrement_Rising;
+		}
+		else if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash)
+		{
+			BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash;
+		}
+		else if (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising)
+		{
+			BoostDecrement = StatusParam.BoostGaugeDecrement_Rising;
+		}
+		UKismetSystemLibrary::PrintString(this, FString::FromInt(BoostDecrement));
+
+		NowBoostCap -=(BoostDecrement * DeltaTime * 100.0f);
 
 		// ブーストゲージが0になったらオーバーヒートフラグを立てる
 		if (NowBoostCap <= 0 && NowBoostState != EBOOST_STATE::OverHeat)
@@ -76,15 +92,19 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 
 }
 
-// ブーストダッシュ開始
-void UBoostCalculator::BeginBoostDash()
+// ブースト消費開始
+void UBoostCalculator::BeginBoost()
 {
-	NowBoostState = EBOOST_STATE::BeginBoostDash;
-	NowBoostCap -= StatusParam.BoostGaugeDecrement_BeginBoostDash;
-
+	NowBoostState = EBOOST_STATE::BeginBoostIgnition;
+	
+	if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash)
+	{
+		NowBoostCap -= StatusParam.BoostGaugeDecrement_BeginBoostDash;
+	}
+		
 }
-// ブーストダッシュ終了
-void UBoostCalculator::EndBoostDash()
+// ブースト消費終了
+void UBoostCalculator::EndBoost()
 {
 	if (NowBoostState != EBOOST_STATE::OverHeat)
 	{
@@ -180,15 +200,15 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 
 }
 
-// ブーストダッシュの開始
-void UCharacterStatusComponent::BeginBoostDash()
+// ブースト消費開始
+void UCharacterStatusComponent::BeginBoost()
 {
-	BoostCalculator->BeginBoostDash();
+	BoostCalculator->BeginBoost();
 }
-// ブーストダッシュ終了
-void UCharacterStatusComponent::EndBoostDash()
+// ブースト消費終了
+void UCharacterStatusComponent::EndBoost()
 {
-	BoostCalculator->EndBoostDash();
+	BoostCalculator->EndBoost();
 }
 
 bool UCharacterStatusComponent::GetIsOverHeat()

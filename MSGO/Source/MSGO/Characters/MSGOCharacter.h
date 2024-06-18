@@ -33,7 +33,7 @@ enum class EJUMP_STATUS : uint8
 {
 	Idle,			// アイドル
 	Rising,			// 上昇中
-	Hovering,		// ホバリング
+	Hovering,		// ホバリングB
 	Falling,		// 落下中
 };
 
@@ -60,6 +60,7 @@ public:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
@@ -152,6 +153,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	float DashRiseSpeed;
 
+	// ブースト速度のステータス
+	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
+
+	// ジャンプのステータス
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EJUMP_STATUS NowJumpStatus;
+
+
 private:
 	// 前フレームの移動入力値
 	FVector2D PrevMoveInput;
@@ -175,11 +184,6 @@ private:
 	// 上昇開始時の高度
 	float BeginRiseHeight;
 
-	// ブースト速度のステータス
-	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
-	// ジャンプのステータス
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	EJUMP_STATUS NowJumpStatus;
 
 protected:
 	// 移動処理
@@ -200,6 +204,9 @@ protected:
 	// ダッシュ　入力中
 	void UpdateDash();
 
+	// ダッシュ終了処理
+	void EndDash();
+
 	// ジャンプ　入力
 	void OnPressJump();
 	// ジャンプ　リリース
@@ -207,11 +214,15 @@ protected:
 	// ジャンプ　入力中
 	void UpdateJump();
 
-	// ダッシュ終了処理
-	void EndDash();
-	
+	// ジャンプ終了処理
+	void EndJump();
+
 	// オーバーヒート時の処理
 	void OnOverHeat();
+
+	// 高度上限かのチェック
+	// return		trueなら高度上限
+	bool IsHeightLimit();
 
 protected:
 	// APawn interface
@@ -236,5 +247,17 @@ public:
 	// カメラの向いている方に向く
 	UFUNCTION(BlueprintCallable)
 	void RotToCamera(float InRotSpeed);
+
+	// 移動タイプの取得
+	EMOVE_TYPE GetNowMoveType()
+	{
+		return MoveType;
+	}
+	// ジャンプ状態の取得
+	EJUMP_STATUS GetNowJumpStatus()
+	{
+		return NowJumpStatus;
+	}
+
 };
 

@@ -128,6 +128,10 @@ public:
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 BoostGaugeDecrement_BoostDash;
 
+    // 上昇時の1フレームあたりのブーストゲージ減少量
+    UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
+    int32 BoostGaugeDecrement_Rising;
+
     // 通常時の1フレームあたりのブーストゲージの上昇量
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
     int32 BoostGaugeIncrement_Normal;
@@ -230,6 +234,10 @@ public:
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブースト移動開始時のブーストゲージ減少量"))
     int32 BoostGaugeDecrement_BeginBoostDash;
+
+    UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "上昇時の1フレームあたりのブーストゲージ減少量"))
+    int32 BoostGaugeDecrement_Rising;
+
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブースト移動時の1フレームあたりのブーストゲージ減少量"))
     int32 BoostGaugeDecrement_BoostDash;

@@ -101,6 +101,17 @@ void AMSGOCharacter::BeginPlay()
 
 }
 
+void AMSGOCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
+	{
+		BeginRiseHeight = 0.f;
+		NowJumpStatus = EJUMP_STATUS::Idle;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -186,7 +197,9 @@ void AMSGOCharacter::OnPressDash()
 	// 移動タイプをダッシュにする
 	MoveType = EMOVE_TYPE::Dash;
 
-	StatusComponent->BeginBoostDash();
+	AddActorWorldOffset(FVector(0.0, 0.0, 10.0f));
+
+	StatusComponent->BeginBoost();
 
 	// 最高速度に移行するまでの秒数を算出
 	TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_MaxSpeed);
@@ -287,7 +300,12 @@ void AMSGOCharacter::EndDash()
 	// 移動タイプを歩行に戻す
 	MoveType = EMOVE_TYPE::Walk;
 
-	StatusComponent->EndBoostDash();
+	//if (NowJumpStatus == EJUMP_STATUS::Idle)
+	{
+		StatusComponent->EndBoost();
+	}
+		
+
 	BoostMoveTimer = 0.f;
 	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
 }
@@ -296,75 +314,119 @@ void AMSGOCharacter::EndDash()
 // ジャンプ　入力
 void AMSGOCharacter::OnPressJump()
 {
-	//if (MoveType == EMOVE_TYPE::Walk && StatusComponent->GetIsOverHeat())
-	//{
-	//	Jump();
-	//}
+	// オバヒ中ならただのジャンプ
+	if (MoveType == EMOVE_TYPE::Walk && StatusComponent->GetIsOverHeat())
+	{
+		Jump();
+		return;
+	}
+
+	switch (NowJumpStatus)
+	{
+	// アイドル
+	case EJUMP_STATUS::Idle:
+		// ジャンプ開始時の高さを種痘
+		BeginRiseHeight = GetActorLocation().Z;
+		// ジャンプのステートを上昇に変える
+		NowJumpStatus = EJUMP_STATUS::Rising;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+
+		break;
+	case EJUMP_STATUS::Falling:
+		NowJumpStatus = EJUMP_STATUS::Hovering;
+		GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+
+		break;
+	default:
+		break;
+	}
 	
+	StatusComponent->BeginBoost();
+
 }
 // ジャンプ　リリース
 void AMSGOCharacter::OnReleaseJump()
 {
-	//if (MoveType == EMOVE_TYPE::Walk)
-	//{
-	//	StopJumping();
+	if (MoveType == EMOVE_TYPE::Dash)
+	{
+		//NowJumpStatus = EJUMP_STATUS::Falling;
+		return;
+	}
 
-	//	GetCharacterMovement()->GravityScale = 1.0f;
-	//}
-	
+	EndJump();
 }
 // ジャンプ　入力中
 void AMSGOCharacter::UpdateJump()
 {
-	// オーバーヒート中は処理しない
+	// オバヒ中なら処理しない
 	if (StatusComponent->GetIsOverHeat())
 	{
 		return;
 	}
 
-	//// 落下時にジャンプボタンを推している場合はホバリングする
-	//if (MoveType == EMOVE_TYPE::Walk)
-	//{
-	//	FVector velocity = GetCharacterMovement()->Velocity;
+	switch (NowJumpStatus)
+	{
+	// 上昇
+	case EJUMP_STATUS::Rising:
+		// 高度上限に達したらホバリングに移行
+		if (IsHeightLimit())
+		{
+			NowJumpStatus = EJUMP_STATUS::Hovering;
+		}
+		// 高度上限でなければ上昇
+		else
+		{
+			FVector riseOffset = FVector(0, 0, StatusComponent->GetStatusParameter().JumpRiseSpeed) * 100.0f * GetWorld()->GetDeltaSeconds();
+			AddActorWorldOffset(riseOffset);
+		}
 
-	//	//if (velocity.Z < 0)
-	//	//{
-	//	//	GetCharacterMovement()->GravityScale = 0.1;
-	//	//}
-	//	UKismetSystemLibrary::PrintString(this, velocity.ToString());
+		break;
+	// ホバリング
+	case EJUMP_STATUS::Hovering:
+		if (MoveType == EMOVE_TYPE::Walk)
+		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+			GetCharacterMovement()->GravityScale = 0.1f;
+		}
+		else if(MoveType == EMOVE_TYPE::Dash)
+		{
+			FVector fallOffset = FVector(0, 0, -0.1f) * 100.0f * GetWorld()->GetDeltaSeconds();
+			AddActorWorldOffset(fallOffset);
+		}
+		break;
+	// 落下中
+	case EJUMP_STATUS::Falling:
+		GetCharacterMovement()->GravityScale = 0.1f;
 
-	//	//if (GetCharacterMovement()->IsFalling() && velocity.Z < 100.0f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
-	//	//{
-	//	//	BeginRiseHeight = GetActorLocation().Z;
-	//	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-	//	//}
-
-	//	//FVector riseOffset = FVector(0.0, 0.0, DashRiseSpeed);
-	//	//AddActorWorldOffset(riseOffset);
-
-	//	//if (GetActorLocation().Z >= BeginRiseHeight)
-	//	//{
-	//	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	//	//	GetCharacterMovement()->GravityScale = 0.1f;
-
-	//	//}
-
-	//}
-	//// ダッシュ中はジャンプじゃなく上昇させる
-	//else
-	//{
-	//	FVector riseOffset = FVector(0.0, 0.0, DashRiseSpeed);
-	//	AddActorWorldOffset(riseOffset);
-
-	//}
-
+		break;
+	default:
+		break;
+	}
 }
 
+// ジャンプ終了処理
+void AMSGOCharacter::EndJump()
+{
+	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+		GetCharacterMovement()->GravityScale = 1.0f;
+
+		NowJumpStatus = EJUMP_STATUS::Falling;
+
+	}
+
+	if (MoveType == EMOVE_TYPE::Walk)
+	{
+		StatusComponent->EndBoost();
+	}
+}
 
 // オーバーヒート時の処理
 void AMSGOCharacter::OnOverHeat()
 {
 	EndDash();
+	EndJump();
 }
 
 
@@ -393,4 +455,11 @@ void AMSGOCharacter::RotToCamera(float InRotSpeed)
 	// カメラの向いている方向に回転
 	SetActorRotation(FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed));
 
+}
+
+// 高度上限かのチェック
+// return		trueなら高度上限
+bool AMSGOCharacter::IsHeightLimit()
+{
+	return GetActorLocation().Z - BeginRiseHeight >= StatusComponent->GetStatusParameter().JumpRiseHeight;
 }
