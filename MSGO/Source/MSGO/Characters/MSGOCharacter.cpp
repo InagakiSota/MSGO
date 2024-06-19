@@ -199,7 +199,7 @@ void AMSGOCharacter::OnPressDash()
 
 	AddActorWorldOffset(FVector(0.0, 0.0, 10.0f));
 
-	StatusComponent->BeginBoost();
+	StatusComponent->BeginBoost_Dash();
 
 	// 最高速度に移行するまでの秒数を算出
 	TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_MaxSpeed);
@@ -292,7 +292,7 @@ void AMSGOCharacter::EndDash()
 {
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
 	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxWalkAcceleration;
+	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
 	GetCharacterMovement()->GravityScale = 1.0f;
 
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
@@ -300,9 +300,14 @@ void AMSGOCharacter::EndDash()
 	// 移動タイプを歩行に戻す
 	MoveType = EMOVE_TYPE::Walk;
 
+	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
+	{
+		NowJumpStatus = EJUMP_STATUS::Falling;
+	}
+
 	//if (NowJumpStatus == EJUMP_STATUS::Idle)
 	{
-		StatusComponent->EndBoost();
+		StatusComponent->EndBoost_Dash();
 	}
 		
 
@@ -334,14 +339,14 @@ void AMSGOCharacter::OnPressJump()
 		break;
 	case EJUMP_STATUS::Falling:
 		NowJumpStatus = EJUMP_STATUS::Hovering;
-		GetCharacterMovement()->Velocity = FVector(0, 0, 0);
+		GetCharacterMovement()->Velocity.Z = 0.0f;
 
 		break;
 	default:
 		break;
 	}
 	
-	StatusComponent->BeginBoost();
+	StatusComponent->BeginBoost_Jump();
 
 }
 // ジャンプ　リリース
@@ -350,6 +355,7 @@ void AMSGOCharacter::OnReleaseJump()
 	if (MoveType == EMOVE_TYPE::Dash)
 	{
 		//NowJumpStatus = EJUMP_STATUS::Falling;
+		StatusComponent->EndBoost_Jump();
 		return;
 	}
 
@@ -388,15 +394,10 @@ void AMSGOCharacter::UpdateJump()
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 			GetCharacterMovement()->GravityScale = 0.1f;
 		}
-		else if(MoveType == EMOVE_TYPE::Dash)
-		{
-			FVector fallOffset = FVector(0, 0, -0.1f) * 100.0f * GetWorld()->GetDeltaSeconds();
-			AddActorWorldOffset(fallOffset);
-		}
 		break;
 	// 落下中
 	case EJUMP_STATUS::Falling:
-		GetCharacterMovement()->GravityScale = 0.1f;
+		NowJumpStatus = EJUMP_STATUS::Hovering;
 
 		break;
 	default:
@@ -409,7 +410,7 @@ void AMSGOCharacter::EndJump()
 {
 	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 		GetCharacterMovement()->GravityScale = 1.0f;
 
 		NowJumpStatus = EJUMP_STATUS::Falling;
@@ -418,7 +419,7 @@ void AMSGOCharacter::EndJump()
 
 	if (MoveType == EMOVE_TYPE::Walk)
 	{
-		StatusComponent->EndBoost();
+		StatusComponent->EndBoost_Jump();
 	}
 }
 

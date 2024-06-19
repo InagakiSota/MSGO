@@ -60,6 +60,17 @@ public:
 	// ブースト消費終了
 	void EndBoost();
 
+	// ブースト消費開始　ダッシュ
+	void BeginBoost_Dash();
+	// ブースト終了処理　ダッシュ
+	void EndBoost_Dash();
+
+	// ブースト消費開始 ジャンプ
+	void BeginBoost_Jump();
+	// ブースト消費終了　ジャンプ
+	void EndBoost_Jump();
+
+
 	// 所有者のセット
 	void SetOwnerCharacter(AMSGOCharacter* InOwnerCharacter)
 	{
@@ -91,6 +102,9 @@ private:
 	// 所有者の参照
 	UPROPERTY()
 	TObjectPtr<AMSGOCharacter> OwnerCharacter;
+
+	// 現在のブースト消費量
+	uint32 BoostDecrementValue;
 
 	// ステータスパラメータ
 	// MEMO:ここで持っていていいかは考え中
@@ -145,6 +159,16 @@ public:
 	
 	// ブースト消費終了
 	void EndBoost();
+
+	// ブースト消費開始　ダッシュ
+	void BeginBoost_Dash();
+	// ブースト終了処理　ダッシュ
+	void EndBoost_Dash();
+
+	// ブースト消費開始 ジャンプ
+	void BeginBoost_Jump();
+	// ブースト消費終了　ジャンプ
+	void EndBoost_Jump();
 
 	// オーバーヒートの取得
 	UFUNCTION(BlueprintPure)

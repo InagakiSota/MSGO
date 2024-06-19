@@ -10,6 +10,7 @@
 
 UBoostCalculator::UBoostCalculator()
 	: NowBoostState(EBOOST_STATE::None)
+	, BoostDecrementValue(0)
 {
 
 }
@@ -33,23 +34,23 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 	// ブーストダッシュ中はゲージを減らす
 	if (NowBoostState == EBOOST_STATE::BeginBoostIgnition)
 	{
-		int32 BoostDecrement = 0;
+		//int32 BoostDecrement = 0;
 
-		if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash && (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering))
-		{
-			BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash + StatusParam.BoostGaugeDecrement_Rising;
-		}
-		else if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash)
-		{
-			BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash;
-		}
-		else if (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising)
-		{
-			BoostDecrement = StatusParam.BoostGaugeDecrement_Rising;
-		}
-		UKismetSystemLibrary::PrintString(this, FString::FromInt(BoostDecrement));
+		//if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash && (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering))
+		//{
+		//	BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash + StatusParam.BoostGaugeDecrement_Rising;
+		//}
+		//else if (OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Dash)
+		//{
+		//	BoostDecrement = StatusParam.BoostGaugeDecrement_BoostDash;
+		//}
+		//else if (OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Hovering || OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Rising)
+		//{
+		//	BoostDecrement = StatusParam.BoostGaugeDecrement_Rising;
+		//}
+		UKismetSystemLibrary::PrintString(this, FString::FromInt(BoostDecrementValue));
 
-		NowBoostCap -=(BoostDecrement * DeltaTime * 100.0f);
+		NowBoostCap -=(BoostDecrementValue * DeltaTime * 100.0f);
 
 		// ブーストゲージが0になったらオーバーヒートフラグを立てる
 		if (NowBoostCap <= 0 && NowBoostState != EBOOST_STATE::OverHeat)
@@ -111,6 +112,44 @@ void UBoostCalculator::EndBoost()
 		NowBoostState = EBOOST_STATE::None;
 	}
 }
+
+// ブースト消費開始　ダッシュ
+void UBoostCalculator::BeginBoost_Dash()
+{
+	NowBoostState = EBOOST_STATE::BeginBoostIgnition;
+	
+	NowBoostCap -= StatusParam.BoostGaugeDecrement_BeginBoostDash;
+
+	BoostDecrementValue += StatusParam.BoostGaugeDecrement_BoostDash;
+}
+// ブースト終了処理　ダッシュ
+void UBoostCalculator::EndBoost_Dash()
+{
+	if (NowBoostState != EBOOST_STATE::OverHeat && OwnerCharacter->GetNowJumpStatus() == EJUMP_STATUS::Idle)
+	{
+		NowBoostState = EBOOST_STATE::None;
+	}
+	BoostDecrementValue -= StatusParam.BoostGaugeDecrement_BoostDash;
+
+}
+
+// ブースト消費開始 ジャンプ
+void UBoostCalculator::BeginBoost_Jump()
+{
+	NowBoostState = EBOOST_STATE::BeginBoostIgnition;
+
+	BoostDecrementValue += StatusParam.BoostGaugeDecrement_Rising;
+}
+// ブースト消費終了　ジャンプ
+void UBoostCalculator::EndBoost_Jump()
+{
+	if (NowBoostState != EBOOST_STATE::OverHeat && OwnerCharacter->GetNowMoveType() == EMOVE_TYPE::Walk)
+	{
+		NowBoostState = EBOOST_STATE::None;
+	}
+	BoostDecrementValue -= StatusParam.BoostGaugeDecrement_Rising;
+}
+
 
 // ステータスパラメータのセットアップ
 void UBoostCalculator::SetupStatusParam(const FCharacterStatusParameter& InStatusParam)
@@ -210,6 +249,29 @@ void UCharacterStatusComponent::EndBoost()
 {
 	BoostCalculator->EndBoost();
 }
+
+// ブースト消費開始　ダッシュ
+void UCharacterStatusComponent::BeginBoost_Dash()
+{
+	BoostCalculator->BeginBoost_Dash();
+}
+// ブースト終了処理　ダッシュ
+void UCharacterStatusComponent::EndBoost_Dash()
+{
+	BoostCalculator->EndBoost_Dash();
+}
+
+// ブースト消費開始 ジャンプ
+void UCharacterStatusComponent::BeginBoost_Jump()
+{
+	BoostCalculator->BeginBoost_Jump();
+}
+// ブースト消費終了　ジャンプ
+void UCharacterStatusComponent::EndBoost_Jump()
+{
+	BoostCalculator->EndBoost_Jump();
+}
+
 
 bool UCharacterStatusComponent::GetIsOverHeat()
 {
