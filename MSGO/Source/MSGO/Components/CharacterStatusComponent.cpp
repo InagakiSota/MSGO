@@ -48,7 +48,7 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 		//{
 		//	BoostDecrement = StatusParam.BoostGaugeDecrement_Rising;
 		//}
-		UKismetSystemLibrary::PrintString(this, FString::FromInt(BoostDecrementValue));
+		//UKismetSystemLibrary::PrintString(this, FString::FromInt(BoostDecrementValue));
 
 		NowBoostCap -=(BoostDecrementValue * DeltaTime * 100.0f);
 

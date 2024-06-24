@@ -99,6 +99,8 @@ void AMSGOCharacter::BeginPlay()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
+	//APlayerCameraManager* cameraManager = UGameplayStati
+
 }
 
 void AMSGOCharacter::Tick(float DeltaSeconds)
