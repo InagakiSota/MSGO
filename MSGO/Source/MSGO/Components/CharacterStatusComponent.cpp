@@ -85,6 +85,7 @@ void UBoostCalculator::CalcNowBoostCap(float DeltaTime)
 			{
 				NowBoostState = EBOOST_STATE::None;
 				BeginChargeTimerWithOverHeat = 0.0f;
+				BoostDecrementValue = 0.0f;
 			}
 		}
 	}
