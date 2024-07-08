@@ -1,17 +1,18 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-// 各種構造体をまとめたやつ
+// 各種構造体、列挙体をまとめたやつ
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "ParameterStructs.generated.h"
 
+// ブーストのタイプ
 UENUM(BlueprintType)
-enum class EBOOST_TYPE : uint8
+enum class EBoostType : uint8
 {
-    NORMAL = 0      UMETA(DisplayName = "通常ブースト"),
-    HOVER           UMETA(DisplayName = "ホバー"),
-    TANK            UMETA(DisplayName = "タンクブースト")
+    Normal = 0      UMETA(DisplayName = "通常ブースト"),
+    Hover           UMETA(DisplayName = "ホバー"),
+    Tank            UMETA(DisplayName = "タンクブースト")
 };
 
 // キャラクターのステータスパラメータ構造体
@@ -42,7 +43,7 @@ public:
 
     // ブーストタイプ
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
-    TEnumAsByte<EBOOST_TYPE> BoostType;
+    TEnumAsByte<EBoostType> BoostType;
 
     // ダウンポイント
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
@@ -172,7 +173,7 @@ public:
     int32 BoostCharge;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブーストタイプ"))
-    TEnumAsByte<EBOOST_TYPE> BoostType;
+    TEnumAsByte<EBoostType> BoostType;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
     int32 MaxDownPoint;
@@ -254,4 +255,34 @@ public:
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "オーバーヒート時にブーストが回復するまでのフレーム数"))
     int32 BeginBoostChargeFrame;
 
+};
+
+// 攻撃のタイプ
+UENUM(BlueprintType)
+enum class EAttackType
+{
+    None = 0,
+    LiveAmmunition,         // 実弾
+    Bomb,                   // 爆発
+    Beam,                   // ビーム
+    Combat,                 // 格闘
+    Max,
+};
+
+// 攻撃コリジョンの列挙体
+USTRUCT(BlueprintType)
+struct FAttackCollisionStr
+{
+    GENERATED_BODY()
+
+public:
+    FAttackCollisionStr();
+
+    int32 BaseAttackPower;      // 基礎攻撃力
+    
+    int32 DownPoint;            // 与えるダウンポイント
+    
+    FVector CollisionSize;      // コリジョンのサイズ
+
+    TEnumAsByte<EAttackType> AttackType;      // 攻撃タイプ
 };

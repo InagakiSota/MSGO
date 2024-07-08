@@ -7,7 +7,7 @@ FCharacterStatusParameter::FCharacterStatusParameter()
     : MaxHP(1000)
     , MaxBoostCap(1000)
     , BoostCharge(100)
-    , BoostType(EBOOST_TYPE::NORMAL)
+    , BoostType(EBoostType::Normal)
     , MaxDownPoint(1000)
     , InitSpeed(800)
     , MaxSpeed(1000)
@@ -42,7 +42,7 @@ FCharacterStatusParameter_TableRow::FCharacterStatusParameter_TableRow()
     : MaxHP(1000)
     , MaxBoostCap(1000)
     , BoostCharge(100)
-    , BoostType(EBOOST_TYPE::NORMAL)
+    , BoostType(EBoostType::Normal)
     , MaxDownPoint(1000)
     , InitSpeed(800)
     , MaxSpeed(1000)
@@ -69,6 +69,16 @@ FCharacterStatusParameter_TableRow::FCharacterStatusParameter_TableRow()
     , BoostGaugeIncrement_OverHeat(5)
     , BoostGaugeDecrement_Avoidance(100)
     , BeginBoostChargeFrame(120)
+{
+
+}
+
+FAttackCollisionStr::FAttackCollisionStr()
+    : BaseAttackPower(0)
+    , DownPoint(0)
+    , CollisionSize(FVector::ZeroVector)
+    , AttackType(EAttackType::LiveAmmunition)
+
 {
 
 }
