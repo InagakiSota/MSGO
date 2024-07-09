@@ -30,13 +30,17 @@ public:
 	// @param		InAttackCollArg		攻撃コリジョンの設定の構造体
 	// @param		InStartPos			攻撃コリジョンの初期位置
 	// @return							起動出来たらtrueを返す
+	UFUNCTION(BlueprintCallable)
 	bool WakeObject(const FAttackCollisionStr& InAttackCollArg, const FVector& InStartPos);
 
+	// オブジェクトの停止
+	UFUNCTION(BlueprintCallable)
+	bool SleepObject();
+
 	// 使用中フラグの取得
+	bool GetIsUsing() { return bIsUsing; }
 
 protected:
-	//UPROPERTY(VisibleDefaultsOnly)
-	//USceneComponent* RootComponent;
 
 	UPROPERTY(VisibleDefaultsOnly)
 	class UBoxComponent* BoxCollision;

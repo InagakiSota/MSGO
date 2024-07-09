@@ -38,6 +38,7 @@ enum class EJUMP_STATUS : uint8
 };
 
 class UCharacterStatusComponent;
+class AAttackCollision;
 
 UCLASS(config=Game)
 class MSGO_API AMSGOCharacter : public ACharacter
@@ -143,7 +144,7 @@ protected:
 
 	// 移動タイプ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
-	TEnumAsByte<EMOVE_TYPE> MoveType;
+	EMOVE_TYPE MoveType;
 
 	// Yawの回転速度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
@@ -183,6 +184,10 @@ private:
 
 	// 上昇開始時の高度
 	float BeginRiseHeight;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<AAttackCollision> AttackCollision;
 
 
 protected:

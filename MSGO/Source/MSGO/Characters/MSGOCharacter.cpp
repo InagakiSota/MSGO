@@ -14,6 +14,7 @@
 #include "Components/CharacterStatusComponent.h"
 #include "Structs/ParameterStructs.h"
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
+#include "Collision/AttackCollision.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
@@ -64,6 +65,11 @@ AMSGOCharacter::AMSGOCharacter()
 
 	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
 	NowJumpStatus = EJUMP_STATUS::Idle;
+
+	FActorSpawnParameters spawnParam;
+	spawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+
 	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
 	
@@ -99,6 +105,12 @@ void AMSGOCharacter::BeginPlay()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
+	AttackCollision = GetWorld()->SpawnActor<AAttackCollision>(AAttackCollision::StaticClass());
+
+	if (AttackCollision)
+	{
+		AttackCollision->SleepObject();
+	}
 	//APlayerCameraManager* cameraManager = UGameplayStati
 
 }

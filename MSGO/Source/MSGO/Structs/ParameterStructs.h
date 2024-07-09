@@ -43,7 +43,7 @@ public:
 
     // ブーストタイプ
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
-    TEnumAsByte<EBoostType> BoostType;
+    EBoostType BoostType;
 
     // ダウンポイント
     UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterStatus")
@@ -173,7 +173,7 @@ public:
     int32 BoostCharge;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ブーストタイプ"))
-    TEnumAsByte<EBoostType> BoostType;
+    EBoostType BoostType;
 
     UPROPERTY(EditAnywhere, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
     int32 MaxDownPoint;
@@ -278,11 +278,15 @@ struct FAttackCollisionStr
 public:
     FAttackCollisionStr();
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 BaseAttackPower;      // 基礎攻撃力
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 DownPoint;            // 与えるダウンポイント
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector CollisionSize;      // コリジョンのサイズ
 
-    TEnumAsByte<EAttackType> AttackType;      // 攻撃タイプ
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TEnumAsByte< EAttackType> AttackType;      // 攻撃タイプ
 };
