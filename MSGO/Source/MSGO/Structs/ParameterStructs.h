@@ -269,24 +269,78 @@ enum class EAttackType
     Max,
 };
 
-// 攻撃コリジョンの列挙体
+// 攻撃コリジョンのパラメータ
 USTRUCT(BlueprintType)
-struct FAttackCollisionStr
+struct FAttackCollisionParameter
 {
     GENERATED_BODY()
 
 public:
-    FAttackCollisionStr();
+    FAttackCollisionParameter();
+
+    // 基礎攻撃力
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 BaseAttackPower;      
+    
+    // 与えるダウンポイント
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 DownPoint;            
+    
+    // コリジョンのサイズ
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FVector CollisionSize;      
+
+    // 攻撃タイプ
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TEnumAsByte< EAttackType> AttackType;      
+
+    // 最大何体のアクターにヒットするか
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 MaxHitAcotrNum;       
+
+    // コリジョンの生存フレーム数
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 LiveMaxFrame;
+    
+};
+
+// 攻撃コリジョンの移動パラメータ
+USTRUCT(BlueprintType)
+struct FAttackCollisionMovementParameter
+{
+    GENERATED_BODY()
+
+public:
+    FAttackCollisionMovementParameter();
+
+public:
+    // 初期位置
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FVector StartPos;           
+
+    // 初期角度
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FRotator StartRot;          
+
+    // 移動する方向ベクトル
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FVector MoveDir;
+
+    // 移動速度
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MoveSpeed;
+};
+
+
+// ダメージコリジョンのパラメータ
+USTRUCT(BlueprintType)
+struct FDamageCollisionParametr
+{
+    GENERATED_BODY()
+
+public:
+    FDamageCollisionParametr();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 BaseAttackPower;      // 基礎攻撃力
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 DownPoint;            // 与えるダウンポイント
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FVector CollisionSize;      // コリジョンのサイズ
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte< EAttackType> AttackType;      // 攻撃タイプ
+    FVector CollisionSize;      // コリジョンサイズ
 };

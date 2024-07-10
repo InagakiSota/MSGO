@@ -31,7 +31,7 @@ public:
 	// @param		InStartPos			攻撃コリジョンの初期位置
 	// @return							起動出来たらtrueを返す
 	UFUNCTION(BlueprintCallable)
-	bool WakeObject(const FAttackCollisionStr& InAttackCollArg, const FVector& InStartPos);
+	bool WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg);
 
 	// オブジェクトの停止
 	UFUNCTION(BlueprintCallable)
@@ -47,4 +47,12 @@ protected:
 
 	// 使用中かのフラグ
 	bool bIsUsing;
+	
+	// 攻撃コリジョンパラメータ
+	FAttackCollisionParameter AttackCollParam;
+	// 移動パラメータ
+	FAttackCollisionMovementParameter MovementParam;
+
+	// 移動時間
+	float MoveTotalSeconds;
 };

@@ -15,6 +15,7 @@
 #include "Structs/ParameterStructs.h"
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
 #include "Collision/AttackCollision.h"
+#include "Collision/DamageCollision.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
@@ -25,6 +26,10 @@ AMSGOCharacter::AMSGOCharacter()
 	// ステータスコンポーネントをアタッチ
 	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
 
+	// ダメージコリジョンをアタッチ
+	DamageCollision = CreateDefaultSubobject<UDamageCollision>(TEXT("DamageCollision"));
+	//AddOwnedComponent(DamageCollision);
+	DamageCollision->SetupAttachment(GetRootComponent());
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -123,6 +128,11 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 	{
 		BeginRiseHeight = 0.f;
 		NowJumpStatus = EJUMP_STATUS::Idle;
+	}
+
+	if (AttackCollision && AttackCollision->GetIsUsing())
+	{
+		AttackCollision->Tick(DeltaSeconds);
 	}
 }
 

@@ -2,6 +2,7 @@
 
 
 #include "Collision/AttackCollision.h"
+#include "../Utility/MSGOBlueprintFunctionLibrary.h"
 
 // Sets default values
 AAttackCollision::AAttackCollision()
@@ -21,9 +22,8 @@ AAttackCollision::AAttackCollision()
 
 	PrimaryActorTick.bCanEverTick = false;
 
-
 	bIsUsing = false;
-
+	MoveTotalSeconds = 0.0f;
 }
 
 // Called when the game starts or when spawned
@@ -37,15 +37,29 @@ void AAttackCollision::BeginPlay()
 void AAttackCollision::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	// コリジョンの生存時間を越えたら削除
+	if (MoveTotalSeconds >= UMSGOBlueprintFunctionLibrary::FrameToSeconds(AttackCollParam.LiveMaxFrame))
+	{
+		SleepObject();
+	}
 
+	// 指定した方向に移動
+	AddActorLocalOffset(MovementParam.MoveDir * MovementParam.MoveSpeed * DeltaTime * 100.0f);
+
+	MoveTotalSeconds += DeltaTime;
 }
 
-bool AAttackCollision::WakeObject(const FAttackCollisionStr& InAttackCollArg, const FVector& InStartPos)
+bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg)
 {
 	if (BoxCollision == nullptr)
 	{
 		return false;
 	}
+
+	// 攻撃コリジョンのパラメータ取得
+	AttackCollParam = InAttackCollArg;
+
 
 	BoxCollision->SetBoxExtent(InAttackCollArg.CollisionSize);
 
@@ -53,13 +67,22 @@ bool AAttackCollision::WakeObject(const FAttackCollisionStr& InAttackCollArg, co
 
 	BoxCollision->SetComponentTickEnabled(true);
 
-	SetActorLocation(InStartPos);
+	// コリジョンの移動パラメータ取得
+	MovementParam = InMovementArg;
+
+	SetActorLocation(InMovementArg.StartPos);
+	SetActorRotation(InMovementArg.StartRot);
+
+	MovementParam.MoveDir.Normalize();
 
 	PrimaryActorTick.bCanEverTick = true;
+
 
 	// テスト描画(削除予定)
 	BoxCollision->bHiddenInGame = false;
 	BoxCollision->SetVisibility(true);
+
+	bIsUsing = true;
 
 	return true;
 }
@@ -79,6 +102,10 @@ bool AAttackCollision::SleepObject()
 
 
 	PrimaryActorTick.bCanEverTick = false;
+
+	bIsUsing = false;
+
+	MoveTotalSeconds = 0.0f;
 
 	return true;
 }

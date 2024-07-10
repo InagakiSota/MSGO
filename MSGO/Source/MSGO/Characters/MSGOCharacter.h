@@ -39,6 +39,7 @@ enum class EJUMP_STATUS : uint8
 
 class UCharacterStatusComponent;
 class AAttackCollision;
+class UDamageCollision;
 
 UCLASS(config=Game)
 class MSGO_API AMSGOCharacter : public ACharacter
@@ -137,6 +138,10 @@ protected:
 	// キャラクターステータスのコンポーネント
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
 	TObjectPtr<UCharacterStatusComponent> StatusComponent;
+
+	// ダメージコリジョンコンポーネント
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DamageCollision")
+	TObjectPtr<UDamageCollision> DamageCollision;
 
 	// 移動入力値
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")

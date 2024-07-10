@@ -73,12 +73,28 @@ FCharacterStatusParameter_TableRow::FCharacterStatusParameter_TableRow()
 
 }
 
-FAttackCollisionStr::FAttackCollisionStr()
+FAttackCollisionParameter::FAttackCollisionParameter()
     : BaseAttackPower(0)
     , DownPoint(0)
     , CollisionSize(FVector::ZeroVector)
     , AttackType(EAttackType::LiveAmmunition)
+    , MaxHitAcotrNum(1)
+    , LiveMaxFrame(60)
+{
 
+}
+
+FAttackCollisionMovementParameter::FAttackCollisionMovementParameter()
+    : StartPos(FVector::ZeroVector)
+    , StartRot(FRotator::ZeroRotator)
+    , MoveDir(FVector::ZeroVector)
+    , MoveSpeed(0.f)
+{
+
+}
+
+FDamageCollisionParametr::FDamageCollisionParametr()
+    : CollisionSize(FVector::ZeroVector)
 {
 
 }
