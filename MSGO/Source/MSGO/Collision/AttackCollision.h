@@ -8,6 +8,7 @@
 #include "../Structs/ParameterStructs.h"
 #include "AttackCollision.generated.h"
 
+class AMSGOCharacter;
 
 UCLASS()
 class MSGO_API AAttackCollision : public AActor
@@ -31,7 +32,7 @@ public:
 	// @param		InStartPos			攻撃コリジョンの初期位置
 	// @return							起動出来たらtrueを返す
 	UFUNCTION(BlueprintCallable)
-	bool WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg);
+	bool WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg, AMSGOCharacter* InOwner = nullptr);
 
 	// オブジェクトの停止
 	UFUNCTION(BlueprintCallable)
@@ -39,6 +40,12 @@ public:
 
 	// 使用中フラグの取得
 	bool GetIsUsing() { return bIsUsing; }
+
+	// 使用者の参照を取得
+	AMSGOCharacter* GetOwnerCharacter()
+	{
+		return OwnerCharacterPtr;
+	}
 
 protected:
 
@@ -55,4 +62,7 @@ protected:
 
 	// 移動時間
 	float MoveTotalSeconds;
+
+	// 使用者の参照
+	AMSGOCharacter* OwnerCharacterPtr;
 };

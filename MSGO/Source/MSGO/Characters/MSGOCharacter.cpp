@@ -111,7 +111,6 @@ void AMSGOCharacter::BeginPlay()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	AttackCollision = GetWorld()->SpawnActor<AAttackCollision>(AAttackCollision::StaticClass());
-
 	if (AttackCollision)
 	{
 		AttackCollision->SleepObject();
@@ -130,10 +129,10 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 		NowJumpStatus = EJUMP_STATUS::Idle;
 	}
 
-	if (AttackCollision && AttackCollision->GetIsUsing())
-	{
-		AttackCollision->Tick(DeltaSeconds);
-	}
+	//if (AttackCollision && AttackCollision->GetIsUsing())
+	//{
+	//	AttackCollision->Tick(DeltaSeconds);
+	//}
 }
 
 //////////////////////////////////////////////////////////////////////////

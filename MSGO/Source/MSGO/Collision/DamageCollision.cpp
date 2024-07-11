@@ -2,6 +2,9 @@
 
 
 #include "Collision/DamageCollision.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "AttackCollision.h"
+#include "../Characters/MSGOCharacter.h"
 
 // Sets default values for this component's properties
 UDamageCollision::UDamageCollision()
@@ -29,8 +32,14 @@ void UDamageCollision::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OnComponentBeginOverlap.AddUniqueDynamic(this, &UDamageCollision::OnBeginOverlap);
 	// ...
 	
+}
+
+void UDamageCollision::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	OnComponentBeginOverlap.RemoveDynamic(this, &UDamageCollision::OnBeginOverlap);
 }
 
 
@@ -45,12 +54,43 @@ void UDamageCollision::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 // コリジョンのセットアップ
 bool UDamageCollision::SetupCollision(const FDamageCollisionParametr& InDamageCollParam)
 {
-	//if (!BoxCollision)
-	//{
-	//	return false;
-	//}
-
 	this->SetBoxExtent(InDamageCollParam.CollisionSize);
 
 	return true;
+}
+
+// オーバーラップ開始処理(被弾処理)
+void UDamageCollision::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//UKismetSystemLibrary::PrintString(this, "BeginOverlap");
+
+	// 攻撃コリジョンがヒットしたかをチェック
+	if (AAttackCollision* attackColl = Cast<AAttackCollision>(Other))
+	{
+		// 自身の使用者を取得
+		AMSGOCharacter* ownerChara = Cast<AMSGOCharacter>(GetOwner());
+		if (!ownerChara)
+		{
+			return;
+		}
+
+		// 攻撃コリジョンの使用者を取得
+		AMSGOCharacter* attackOwner = attackColl->GetOwnerCharacter();
+		//　攻撃の使用者がNull、もしくは自身の使用者と同じ場合は処理しない
+		if (!attackOwner || ownerChara == attackOwner)
+		{
+			return;
+		}
+
+		// ここまで来たらヒット
+		UKismetSystemLibrary::PrintString(this, "BeginOverlap");
+		// 攻撃コリジョンを削除（いったん）
+		attackColl->SleepObject();
+
+		// 攻撃者とチームIDが異なる場合はダメージ処理
+		if (attackOwner->TeamId != ownerChara->TeamId)
+		{
+			// ここにダメージ処理を書く
+		}
+	}
 }

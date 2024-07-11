@@ -3,6 +3,7 @@
 
 #include "Collision/AttackCollision.h"
 #include "../Utility/MSGOBlueprintFunctionLibrary.h"
+#include "../Characters/MSGOCharacter.h"
 
 // Sets default values
 AAttackCollision::AAttackCollision()
@@ -20,7 +21,7 @@ AAttackCollision::AAttackCollision()
 		BoxCollision->SetComponentTickEnabled(false);
 	}
 
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bIsUsing = false;
 	MoveTotalSeconds = 0.0f;
@@ -31,6 +32,7 @@ void AAttackCollision::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	this->SetActorTickEnabled(false);
 }
 
 // Called every frame
@@ -50,12 +52,18 @@ void AAttackCollision::Tick(float DeltaTime)
 	MoveTotalSeconds += DeltaTime;
 }
 
-bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg)
+bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg, AMSGOCharacter* InOwner)
 {
 	if (BoxCollision == nullptr)
 	{
 		return false;
 	}
+
+	// 既に起動中の場合は処理しない
+	//if (bIsUsing)
+	//{
+	//	return false;
+	//}
 
 	// 攻撃コリジョンのパラメータ取得
 	AttackCollParam = InAttackCollArg;
@@ -75,12 +83,13 @@ bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollA
 
 	MovementParam.MoveDir.Normalize();
 
-	PrimaryActorTick.bCanEverTick = true;
-
-
 	// テスト描画(削除予定)
 	BoxCollision->bHiddenInGame = false;
 	BoxCollision->SetVisibility(true);
+
+	OwnerCharacterPtr = InOwner;
+
+	SetActorTickEnabled(true);
 
 	bIsUsing = true;
 
@@ -101,7 +110,7 @@ bool AAttackCollision::SleepObject()
 	BoxCollision->SetVisibility(false);
 
 
-	PrimaryActorTick.bCanEverTick = false;
+	this->SetActorTickEnabled(false);
 
 	bIsUsing = false;
 

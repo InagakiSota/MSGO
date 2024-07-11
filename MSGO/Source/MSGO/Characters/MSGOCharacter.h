@@ -37,6 +37,13 @@ enum class EJUMP_STATUS : uint8
 	Falling,		// 落下中
 };
 
+UENUM(BlueprintType)
+enum class ETeamID : uint8
+{
+	TeamA,
+	TeamB,
+};
+
 class UCharacterStatusComponent;
 class AAttackCollision;
 class UDamageCollision;
@@ -72,6 +79,10 @@ public:
 	// 機体ID
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter", meta = (DisplayName = "機体ID", DisplayPriority = "1"))
 	int32 MachineID;
+
+	// チームID
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter")
+	TEnumAsByte<ETeamID> TeamId;
 
 protected:
 	// MappingContext
@@ -245,8 +256,6 @@ protected:
 	{
 		return StatusComponent;
 	}
-
-
 
 public:
 	/** Returns CameraBoom subobject **/
