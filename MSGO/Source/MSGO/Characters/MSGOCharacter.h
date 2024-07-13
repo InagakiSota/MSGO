@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "InputActionValue.h"
+#include "../Structs/ParameterStructs.h"
 
 #include "MSGOCharacter.generated.h"
 
@@ -37,16 +38,14 @@ enum class EJUMP_STATUS : uint8
 	Falling,		// 落下中
 };
 
-UENUM(BlueprintType)
-enum class ETeamID : uint8
-{
-	TeamA,
-	TeamB,
-};
 
 class UCharacterStatusComponent;
 class AAttackCollision;
 class UDamageCollision;
+
+//struct FMachineTeamID;
+//struct FAttackCollisionPowerParameter;
+
 
 UCLASS(config=Game)
 class MSGO_API AMSGOCharacter : public ACharacter
@@ -80,9 +79,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter", meta = (DisplayName = "機体ID", DisplayPriority = "1"))
 	int32 MachineID;
 
+	//// チームID
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter")
+	//TEnumAsByte<ETeamID> TeamId;
+
 	// チームID
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MSGOCharacter")
-	TEnumAsByte<ETeamID> TeamId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MSGOCharacter")
+	FMachineTeamID MachineTeamID;
 
 protected:
 	// MappingContext
@@ -277,6 +280,9 @@ public:
 	{
 		return NowJumpStatus;
 	}
+
+	// 被弾処理
+	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
 };
 

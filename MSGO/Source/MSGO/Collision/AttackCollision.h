@@ -9,6 +9,7 @@
 #include "AttackCollision.generated.h"
 
 class AMSGOCharacter;
+struct FMachineTeamID;
 
 UCLASS()
 class MSGO_API AAttackCollision : public AActor
@@ -32,7 +33,7 @@ public:
 	// @param		InStartPos			攻撃コリジョンの初期位置
 	// @return							起動出来たらtrueを返す
 	UFUNCTION(BlueprintCallable)
-	bool WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg, AMSGOCharacter* InOwner = nullptr);
+	bool WakeObject(const FAttackParameter& InAttackParam, const FMachineTeamID& InOwnerTeamID);
 
 	// オブジェクトの停止
 	UFUNCTION(BlueprintCallable)
@@ -47,22 +48,43 @@ public:
 		return OwnerCharacterPtr;
 	}
 
+	// 攻撃力パラメータを取得
+	UFUNCTION(BlueprintPure)
+	FAttackCollisionPowerParameter GetAttackPowerParameter() const
+	{
+		return AttackParam.PowerParam;
+	}
+
+	// 使用者のチームIDを取得
+	UFUNCTION(BlueprintPure)
+	FMachineTeamID GetOwnerTeamID() const
+	{
+		return OwnerTeamID;
+	}
+
+
 protected:
 
 	UPROPERTY(VisibleDefaultsOnly)
-	class UBoxComponent* BoxCollision;
+	TObjectPtr<UBoxComponent> BoxCollision;
+
+#if WITH_EDITOR
+	//UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
+#endif
 
 	// 使用中かのフラグ
 	bool bIsUsing;
-	
-	// 攻撃コリジョンパラメータ
-	FAttackCollisionParameter AttackCollParam;
-	// 移動パラメータ
-	FAttackCollisionMovementParameter MovementParam;
+
+	// 攻撃パラメータ
+	FAttackParameter AttackParam;
 
 	// 移動時間
 	float MoveTotalSeconds;
 
 	// 使用者の参照
 	AMSGOCharacter* OwnerCharacterPtr;
+
+	// 使用者のチームID
+	FMachineTeamID OwnerTeamID;
 };

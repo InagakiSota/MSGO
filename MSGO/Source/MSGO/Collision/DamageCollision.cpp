@@ -52,7 +52,7 @@ void UDamageCollision::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 }
 
 // コリジョンのセットアップ
-bool UDamageCollision::SetupCollision(const FDamageCollisionParametr& InDamageCollParam)
+bool UDamageCollision::SetupCollision(const FDamageCollisionParameter& InDamageCollParam)
 {
 	this->SetBoxExtent(InDamageCollParam.CollisionSize);
 
@@ -74,23 +74,30 @@ void UDamageCollision::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActo
 			return;
 		}
 
-		// 攻撃コリジョンの使用者を取得
-		AMSGOCharacter* attackOwner = attackColl->GetOwnerCharacter();
-		//　攻撃の使用者がNull、もしくは自身の使用者と同じ場合は処理しない
-		if (!attackOwner || ownerChara == attackOwner)
+		//// 攻撃コリジョンの使用者を取得
+		//AMSGOCharacter* attackOwner = attackColl->GetOwnerCharacter();
+		////　攻撃の使用者がNull、もしくは自身の使用者と同じ場合は処理しない
+		//if (!attackOwner || ownerChara == attackOwner)
+		//{
+		//	return;
+		//}
+
+		// 使用者と被弾者のIDが同じ場合は処理しない
+		if (attackColl->GetOwnerTeamID() == ownerChara->MachineTeamID)
 		{
 			return;
 		}
 
-		// ここまで来たらヒット
-		UKismetSystemLibrary::PrintString(this, "BeginOverlap");
+		//if(owner)
+
 		// 攻撃コリジョンを削除（いったん）
 		attackColl->SleepObject();
 
 		// 攻撃者とチームIDが異なる場合はダメージ処理
-		if (attackOwner->TeamId != ownerChara->TeamId)
+		if (attackColl->GetOwnerTeamID().TeamID != ownerChara->MachineTeamID.TeamID)
 		{
 			// ここにダメージ処理を書く
+			ownerChara->AddDamage(attackColl->GetAttackPowerParameter());
 		}
 	}
 }

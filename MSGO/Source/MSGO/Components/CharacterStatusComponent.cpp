@@ -290,3 +290,9 @@ const int32 UCharacterStatusComponent::GetNowSpeed()
 
 	return 0;
 }
+
+// 被弾処理
+void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
+{
+	UKismetSystemLibrary::PrintString(this, FString::FromInt(InAttackPowerParam.BaseAttackPower));
+}

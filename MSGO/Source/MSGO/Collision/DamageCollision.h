@@ -29,7 +29,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	bool SetupCollision(const FDamageCollisionParametr& InDamageCollParam);
+	bool SetupCollision(const FDamageCollisionParameter& InDamageCollParam);
 
 	// オーバーラップ開始処理
 	UFUNCTION()

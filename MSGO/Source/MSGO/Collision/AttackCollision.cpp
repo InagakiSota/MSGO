@@ -12,6 +12,7 @@ AAttackCollision::AAttackCollision()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(FName(TEXT("RootCollision")));
 
+	// BoxComponent生成
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(FName(TEXT("BoxCollision")));
 	if (BoxCollision)
 	{
@@ -20,6 +21,20 @@ AAttackCollision::AAttackCollision()
 		BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		BoxCollision->SetComponentTickEnabled(false);
 	}
+
+#if WITH_EDITOR
+
+	// テスト用にStaticMesh生成
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(FName(TEXT("StaticMesh")));
+	
+	UStaticMesh* mesh = LoadObject<UStaticMesh>(NULL, TEXT("/Engine/BasicShapes/Cube.Cube"));
+	StaticMesh->SetStaticMesh(mesh);
+
+	StaticMesh->SetupAttachment(RootComponent);
+
+	StaticMesh->SetVisibility(false);
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+#endif
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -41,55 +56,53 @@ void AAttackCollision::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 	// コリジョンの生存時間を越えたら削除
-	if (MoveTotalSeconds >= UMSGOBlueprintFunctionLibrary::FrameToSeconds(AttackCollParam.LiveMaxFrame))
+	if (MoveTotalSeconds >= UMSGOBlueprintFunctionLibrary::FrameToSeconds(AttackParam.CollisionParam.LiveMaxFrame))
 	{
 		SleepObject();
 	}
 
 	// 指定した方向に移動
-	AddActorLocalOffset(MovementParam.MoveDir * MovementParam.MoveSpeed * DeltaTime * 100.0f);
-
+	AddActorLocalOffset(AttackParam.MovementParam.MoveDir * AttackParam.MovementParam.MoveSpeed * DeltaTime * 100.0f);
+	// タイマー加算
 	MoveTotalSeconds += DeltaTime;
 }
 
-bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollArg, const FAttackCollisionMovementParameter& InMovementArg, AMSGOCharacter* InOwner)
+bool AAttackCollision::WakeObject(const FAttackParameter& InAttackParam, const FMachineTeamID& InOwnerTeamID)
 {
 	if (BoxCollision == nullptr)
 	{
 		return false;
 	}
 
-	// 既に起動中の場合は処理しない
-	//if (bIsUsing)
-	//{
-	//	return false;
-	//}
+	// 攻撃パラメータ取得
+	AttackParam = InAttackParam;
 
-	// 攻撃コリジョンのパラメータ取得
-	AttackCollParam = InAttackCollArg;
-
-
-	BoxCollision->SetBoxExtent(InAttackCollArg.CollisionSize);
-
+	// コリジョンパラメータからサイズのセットアップ
+	BoxCollision->SetBoxExtent(AttackParam.CollisionParam.CollisionSize);
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
 	BoxCollision->SetComponentTickEnabled(true);
 
-	// コリジョンの移動パラメータ取得
-	MovementParam = InMovementArg;
+	// 移動パラメータから初期座標、初期角度をセット
+	SetActorLocation(AttackParam.MovementParam.StartPos);
+	SetActorRotation(AttackParam.MovementParam.StartRot);
 
-	SetActorLocation(InMovementArg.StartPos);
-	SetActorRotation(InMovementArg.StartRot);
+	AttackParam.MovementParam.MoveDir.Normalize();
 
-	MovementParam.MoveDir.Normalize();
-
-	// テスト描画(削除予定)
+#if WITH_EDITOR
+	// テスト描画
 	BoxCollision->bHiddenInGame = false;
 	BoxCollision->SetVisibility(true);
 
-	OwnerCharacterPtr = InOwner;
+	StaticMesh->SetVisibility(true);
+
+#endif
+	//OwnerCharacterPtr = InOwner;
+
+	OwnerTeamID = InOwnerTeamID;
 
 	SetActorTickEnabled(true);
+
+	MoveTotalSeconds = 0.0f;
 
 	bIsUsing = true;
 
@@ -98,22 +111,26 @@ bool AAttackCollision::WakeObject(const FAttackCollisionParameter& InAttackCollA
 
 bool AAttackCollision::SleepObject()
 {
-
+	// コリジョンの無効化
 	BoxCollision->SetBoxExtent(FVector(0.f));
-
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	BoxCollision->SetComponentTickEnabled(false);
 
-	// テスト描画(削除予定)
+#if WITH_EDITOR
+	// テスト描画 非表示に
 	BoxCollision->bHiddenInGame = true;
 	BoxCollision->SetVisibility(false);
 
+	StaticMesh->SetVisibility(false);
 
+#endif
+	// Tickを止める
 	this->SetActorTickEnabled(false);
 
+	// 未使用にする
 	bIsUsing = false;
 
+	// タイマーリセット
 	MoveTotalSeconds = 0.0f;
 
 	return true;

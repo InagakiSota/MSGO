@@ -177,6 +177,9 @@ public:
 	// 現在のスピードを取得
 	const int32 GetNowSpeed();
 
+	// 被弾処理
+	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
+
 public:
 	FOnOverHeatDelegate OnOverHeatDelegate;
 

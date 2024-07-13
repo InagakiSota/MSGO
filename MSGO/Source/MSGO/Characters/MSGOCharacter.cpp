@@ -487,3 +487,9 @@ bool AMSGOCharacter::IsHeightLimit()
 {
 	return GetActorLocation().Z - BeginRiseHeight >= StatusComponent->GetStatusParameter().JumpRiseHeight;
 }
+
+// 被弾処理
+void AMSGOCharacter::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
+{
+	StatusComponent->AddDamage(InAttackPowerParam);
+}

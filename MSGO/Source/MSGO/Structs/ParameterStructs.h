@@ -269,6 +269,28 @@ enum class EAttackType
     Max,
 };
 
+// 攻撃コリジョンの攻撃力パラメータ
+USTRUCT(BlueprintType)
+struct FAttackCollisionPowerParameter
+{
+    GENERATED_BODY()
+
+public:
+    FAttackCollisionPowerParameter();
+
+    // 基礎攻撃力
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 BaseAttackPower;
+
+    // ダウンポイント
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    int32 DownPoint;
+
+    // 攻撃タイプ
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    TEnumAsByte< EAttackType> AttackType;
+};
+
 // 攻撃コリジョンのパラメータ
 USTRUCT(BlueprintType)
 struct FAttackCollisionParameter
@@ -278,21 +300,9 @@ struct FAttackCollisionParameter
 public:
     FAttackCollisionParameter();
 
-    // 基礎攻撃力
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 BaseAttackPower;      
-    
-    // 与えるダウンポイント
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 DownPoint;            
-    
     // コリジョンのサイズ
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector CollisionSize;      
-
-    // 攻撃タイプ
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    TEnumAsByte< EAttackType> AttackType;      
 
     // 最大何体のアクターにヒットするか
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -331,16 +341,62 @@ public:
     float MoveSpeed;
 };
 
-
-// ダメージコリジョンのパラメータ
+// 攻撃パラメータ
 USTRUCT(BlueprintType)
-struct FDamageCollisionParametr
+struct FAttackParameter
 {
     GENERATED_BODY()
 
 public:
-    FDamageCollisionParametr();
+    //FAttackParameter();
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FAttackCollisionPowerParameter PowerParam;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FAttackCollisionParameter CollisionParam;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    FAttackCollisionMovementParameter MovementParam;
+
+};
+
+// ダメージコリジョンのパラメータ
+USTRUCT(BlueprintType)
+struct FDamageCollisionParameter
+{
+    GENERATED_BODY()
+
+public:
+    FDamageCollisionParameter();
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     FVector CollisionSize;      // コリジョンサイズ
+};
+
+// チームID
+UENUM(BlueprintType)
+enum class ETeamID : uint8
+{
+    TeamA,
+    TeamB,
+};
+
+// 機体のチームID
+USTRUCT(BlueprintType)
+struct FMachineTeamID
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "チームID"))
+    TEnumAsByte<ETeamID> TeamID;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "機体番号"))
+    uint8 MachineNum;
+
+    bool operator == (const FMachineTeamID& InStr) const
+    {
+        return TeamID == InStr.TeamID && MachineNum == InStr.MachineNum;
+    }
 };
