@@ -185,25 +185,25 @@ public:
 
 protected:
 	// 現在のHP
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "現在のHP"))
-	int32 NowHP;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float NowHP;
 	// 最大HP
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大HP"))
-	int32 MaxHP;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float MaxHP;
 
 	// ブースト容量
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "現在のブースト容量"))
-	int32 NowBoostCap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float NowBoostCap;
 	// 最大ブースト容量
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大ブースト容量"))
-	int32 MaxBoostCap;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float MaxBoostCap;
 
 	// ダウンポイント
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "ダウンポイント"))
-	int32 NowDownPoint;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float NowDownPoint;
 	// 最大ダウンポイント
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus", meta = (DisplayName = "最大ダウンポイント"))
-	int32 MaxDownPoint;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	float MaxDownPoint;
 
 	// コンポーネント所有者の参照
 	UPROPERTY()

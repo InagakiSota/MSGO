@@ -76,7 +76,7 @@ FCharacterStatusParameter_TableRow::FCharacterStatusParameter_TableRow()
 FAttackCollisionPowerParameter::FAttackCollisionPowerParameter()
     : BaseAttackPower(0)
     , DownPoint(0)
-    , AttackType(EAttackType::LiveAmmunition)
+    , AttackType(EAttackType::Bullet)
 {
 
 }

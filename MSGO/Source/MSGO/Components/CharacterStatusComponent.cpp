@@ -295,4 +295,32 @@ const int32 UCharacterStatusComponent::GetNowSpeed()
 void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
 {
 	UKismetSystemLibrary::PrintString(this, FString::FromInt(InAttackPowerParam.BaseAttackPower));
+
+	FCharacterStatusParameter statusParam = GetStatusParameter();
+
+	float damage = (float)InAttackPowerParam.BaseAttackPower;
+	
+	// 攻撃の属性ごとにダメージのカット率を計算する
+	switch (InAttackPowerParam.AttackType)
+	{
+	case EAttackType::Bullet:
+		damage *= 1.0f - statusParam.DamageCutRate_Bullet;
+		break;
+	case EAttackType::Bomb:
+		damage *= 1.0f - statusParam.DamageCutRate_Bomb;
+		break;
+	case EAttackType::Beam:
+		damage *= 1.0f - statusParam.DamageCutRate_Beam;
+		break;
+	case EAttackType::Combat:
+		damage *= 1.0f - statusParam.DamageCutRate_Combat;
+		break;
+	default:
+		break;
+	}
+
+	NowHP -= damage;
+	NowDownPoint -= InAttackPowerParam.DownPoint;
+
+	//GetStatusParameter().cu
 }

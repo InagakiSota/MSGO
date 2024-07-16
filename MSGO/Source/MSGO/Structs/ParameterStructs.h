@@ -262,7 +262,7 @@ UENUM(BlueprintType)
 enum class EAttackType
 {
     None = 0,
-    LiveAmmunition,         // 実弾
+    Bullet,                 // 実弾
     Bomb,                   // 爆発
     Beam,                   // ビーム
     Combat,                 // 格闘
