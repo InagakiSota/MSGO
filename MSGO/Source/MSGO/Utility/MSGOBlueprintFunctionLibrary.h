@@ -22,5 +22,13 @@ public:
 	// 秒数をフレームに変換(60fps)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int32 SecondsToFrame(const float InSeconds);
+
+	// ストリングテーブルをCSVにエクスポート
+	UFUNCTION(BlueprintCallable)
+	static bool ExportCSVFromCSVString(const FString& CSVString, FString FileName);
+
+	UFUNCTION(BlueprintCallable)
+	static bool ExportCSVFromDataTable(UDataTable* DataTable, FString FileName);
 	
+
 };

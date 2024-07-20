@@ -18,3 +18,18 @@ int32 UMSGOBlueprintFunctionLibrary::SecondsToFrame(const float InSeconds)
     
     return int32(InSeconds / oneFrameSeconds);
 }
+
+// ストリングテーブルをCSVにエクスポート
+bool UMSGOBlueprintFunctionLibrary::ExportCSVFromCSVString(const FString& CSVString, FString FileName)
+{
+    return FFileHelper::SaveStringToFile(CSVString, *FileName);
+}
+
+bool UMSGOBlueprintFunctionLibrary::ExportCSVFromDataTable(UDataTable* DataTable, FString FileName)
+{
+    if (DataTable)
+    {
+        return FFileHelper::SaveStringToFile(DataTable->GetTableAsCSV(), *FileName);
+    }
+    return false;
+}

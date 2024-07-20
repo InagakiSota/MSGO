@@ -34,11 +34,11 @@ void UCharacterStatusDataAsset::Build()
 
     TArray<UPackage*> PackagesToSave;
 
-    //// データテーブルをリインポート
-    //if (FReimportManager::Instance()->Reimport(DataTable, false, true))
-    //{
-    //    PackagesToSave.Add(DataTable->GetOutermost());
-    //}
+    // データテーブルをリインポート
+    if (FReimportManager::Instance()->Reimport(DataTable, false, true))
+    {
+        PackagesToSave.Add(DataTable->GetOutermost());
+    }
 
     CharacterParameterMap.Empty();
 
