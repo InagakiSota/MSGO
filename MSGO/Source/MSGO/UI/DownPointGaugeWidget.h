@@ -7,7 +7,7 @@
 #include "DownPointGaugeWidget.generated.h"
 
 /**
- * 
+ * ダウンポイントゲージのウィジェットクラス
  */
 UCLASS()
 class MSGO_API UDownPointGaugeWidget : public UUserWidget

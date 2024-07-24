@@ -3,6 +3,7 @@
 #include "MSGOGameMode.h"
 #include "Characters/MSGOCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UI/MSGOHud.h"
 
 AMSGOGameMode::AMSGOGameMode()
 {
@@ -14,4 +15,6 @@ AMSGOGameMode::AMSGOGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	HUDClass = AMSGOHud::StaticClass();
 }

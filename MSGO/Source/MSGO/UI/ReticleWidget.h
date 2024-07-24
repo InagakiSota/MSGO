@@ -7,7 +7,7 @@
 #include "ReticleWidget.generated.h"
 
 /**
- * 
+ * レティクルのウィジェットクラス
  */
 UCLASS()
 class MSGO_API UReticleWidget : public UUserWidget

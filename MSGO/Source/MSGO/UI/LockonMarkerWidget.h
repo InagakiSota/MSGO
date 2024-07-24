@@ -7,7 +7,7 @@
 #include "LockonMarkerWidget.generated.h"
 
 /**
- * 
+ * ロックオンマーカーのウィジェットクラス
  */
 UCLASS()
 class MSGO_API ULockonMarkerWidget : public UUserWidget

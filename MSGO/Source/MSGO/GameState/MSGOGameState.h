@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "MSGOGameState.generated.h"
 
+class UMSGOUIManager;
+
 /**
  * 
  */
@@ -13,5 +15,9 @@ UCLASS()
 class MSGO_API AMSGOGameState : public AGameStateBase
 {
 	GENERATED_BODY()
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UMSGOUIManager> UIManager;
 	
 };

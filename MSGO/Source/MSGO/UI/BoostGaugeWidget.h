@@ -7,7 +7,7 @@
 #include "BoostGaugeWidget.generated.h"
 
 /**
- * 
+ * ブーストゲージのウィジェットクラス
  */
 UCLASS()
 class MSGO_API UBoostGaugeWidget : public UUserWidget

@@ -7,7 +7,7 @@
 #include "HPGaugeWidget.generated.h"
 
 /**
- * 
+ * HPゲージのウィジェットクラス
  */
 UCLASS()
 class MSGO_API UHPGaugeWidget : public UUserWidget
