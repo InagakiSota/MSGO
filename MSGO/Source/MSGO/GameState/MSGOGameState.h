@@ -19,5 +19,16 @@ class MSGO_API AMSGOGameState : public AGameStateBase
 protected:
 	UPROPERTY()
 	TObjectPtr<UMSGOUIManager> UIManager;
+
+public:
+
+	virtual void BeginPlay() override;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	UMSGOUIManager* GetUIManager()
+	{
+		return UIManager;
+	}
 	
 };

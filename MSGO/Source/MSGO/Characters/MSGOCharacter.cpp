@@ -16,6 +16,8 @@
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
 #include "Collision/AttackCollision.h"
 #include "Collision/DamageCollision.h"
+#include "../GameState/MSGOGameState.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
@@ -73,8 +75,6 @@ AMSGOCharacter::AMSGOCharacter()
 
 	FActorSpawnParameters spawnParam;
 	spawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-
 	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
 	
@@ -133,6 +133,8 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 	//{
 	//	AttackCollision->Tick(DeltaSeconds);
 	//}
+
+	//UGameplayStatics::GetGame
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -479,6 +481,8 @@ void AMSGOCharacter::RotToCamera(float InRotSpeed)
 	// カメラの向いている方向に回転
 	SetActorRotation(FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed));
 
+	
+	//AMSGOGameState::
 }
 
 // 高度上限かのチェック

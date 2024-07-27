@@ -4,7 +4,9 @@
 #include "UI/MSGOHud.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "GameState/MSGOGameState.h"
 #include "MyHudWidget.h"
+#include "UI/MSGOUIManager.h"
 
 void AMSGOHud::BeginPlay()
 {
@@ -21,5 +23,20 @@ void AMSGOHud::BeginPlay()
    
         // ViewPort‚É’Ç‰Á
         UIRef->AddToViewport(0);
+
     }
+
+    AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
+    if (!gameState)
+    {
+        return;
+    }
+
+    UMSGOUIManager* uiManager = gameState->GetUIManager();
+    if (!uiManager)
+    {
+        return;
+    }
+
+    uiManager->SetHudWidget(UIRef);
 }

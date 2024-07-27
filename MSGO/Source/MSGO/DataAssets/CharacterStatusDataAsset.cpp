@@ -53,6 +53,7 @@ void UCharacterStatusDataAsset::Build()
         // ゲーム上で使える形にする
         FCharacterStatusParameter CharacterParameter;
         CharacterParameter.MachineName = RowName;
+        CharacterParameter.MaxHP                    = TableRow->MaxHP;
         CharacterParameter.MaxSpeed                 = TableRow->MaxSpeed;
         CharacterParameter.MaxBoostCap              = TableRow->MaxBoostCap;
         CharacterParameter.BoostCharge              = TableRow->BoostCharge;

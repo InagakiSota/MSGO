@@ -29,6 +29,5 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static bool ExportCSVFromDataTable(UDataTable* DataTable, FString FileName);
-	
 
 };

@@ -4,6 +4,7 @@
 #include "Characters/MSGOCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UI/MSGOHud.h"
+#include "GameState/MSGOGameState.h"
 
 AMSGOGameMode::AMSGOGameMode()
 {
@@ -17,4 +18,6 @@ AMSGOGameMode::AMSGOGameMode()
 	}
 
 	HUDClass = AMSGOHud::StaticClass();
+
+	GameStateClass = AMSGOGameState::StaticClass();
 }

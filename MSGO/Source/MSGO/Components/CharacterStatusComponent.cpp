@@ -7,6 +7,9 @@
 #include "Characters/MSGOCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameState/MSGOGameState.h"
+#include "UI/MSGOUIManager.h"
 
 UBoostCalculator::UBoostCalculator()
 	: NowBoostState(EBOOST_STATE::None)
@@ -238,6 +241,19 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 	NowDownPoint = MaxDownPoint = StatusParameter.MaxDownPoint;
 	NowBoostCap = MaxBoostCap = BoostCalculator->GetNowBoostCap();
 
+	// UIまわりのセットアップ
+	AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
+	if (!gameState)
+	{
+		return;
+	}
+	UMSGOUIManager* uiManager = gameState->GetUIManager();
+	if (!uiManager)
+	{
+		return;
+	}
+
+	uiManager->SetupHPGauge(NowHP);
 }
 
 // ブースト消費開始

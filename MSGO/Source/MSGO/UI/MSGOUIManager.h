@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "MSGOUIManager.generated.h"
 
+class UMyHudWidget;
+
 /**
  * 
  */
@@ -16,6 +18,24 @@ class MSGO_API UMSGOUIManager : public UObject
 
 private:
 	// HUDウィジェット
-	
+	UPROPERTY()
+	TObjectPtr<UMyHudWidget> HudWidget;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	UMyHudWidget* GetHudWidget()
+	{
+		return HudWidget;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetHudWidget(UMyHudWidget* InHudWidget)
+	{
+		HudWidget = InHudWidget;
+	}
+
+public:
+	// 体力ゲージのセットアップ
+	void SetupHPGauge(const int32 InMaxHP);
 	
 };
