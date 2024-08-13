@@ -16,19 +16,35 @@ class MSGO_API UHPGaugeWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	// 最大HPのテキストのセット
+	// @param			InMaxHP		最大体力
 	UFUNCTION(BlueprintCallable)
 	void SetMaxHPText(const int32 InMaxHP);
 
 	// 現在のHPのテキストのセット
+	// @param			InNowHP		現在の体力
 	UFUNCTION(BlueprintCallable)
 	void SetNowHPText(const int32 InNowHP);
+
+public:
+	// セットアップ
+	// @param			InMaxHP		現在の体力
+	UFUNCTION(BlueprintCallable)
+	void Setup(const int32 InMaxHP);
+
+	// 現在のHPのセット
+	UFUNCTION(BlueprintCallable)
+	void SetNowHP(const int32 InNowHP);
+
 
 protected:
 	virtual void NativeConstruct() override;
 
 	bool Initialize() override;
+
+	// HPゲージの更新
+	void UpdateHPGauge();
 	
 protected:
 	// 最大HPのテキスト
@@ -42,4 +58,10 @@ protected:
 	// HPゲージ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UProgressBar> HPGauge;
+
+	// 最大HP
+	int32 MaxHP;
+
+	// 現在HP
+	int32 NowHP;
 };

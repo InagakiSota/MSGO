@@ -19,6 +19,22 @@ void UMSGOUIManager::SetupHPGauge(const int32 InMaxHP)
         return;
     }
 
-    hpGauge->SetMaxHPText(InMaxHP);
-    hpGauge->SetNowHPText(InMaxHP);
+    hpGauge->Setup(InMaxHP);
+}
+
+// Œ»Ý‚Ì‘Ì—Í‚ðƒZƒbƒg
+void UMSGOUIManager::SetNowHP(const int32 InNowHP)
+{
+    if (!HudWidget)
+    {
+        return;
+    }
+
+    UHPGaugeWidget* hpGauge = HudWidget->GetHPGauge();
+    if (!hpGauge)
+    {
+        return;
+    }
+
+    hpGauge->SetNowHP(InNowHP);
 }

@@ -338,5 +338,17 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	NowHP -= damage;
 	NowDownPoint -= InAttackPowerParam.DownPoint;
 
-	//GetStatusParameter().cu
+	// UIに反映
+	AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
+	if (!gameState)
+	{
+		return;
+	}
+	UMSGOUIManager* uiManager = gameState->GetUIManager();
+	if (!uiManager)
+	{
+		return;
+	}
+
+	uiManager->SetNowHP(NowHP);
 }

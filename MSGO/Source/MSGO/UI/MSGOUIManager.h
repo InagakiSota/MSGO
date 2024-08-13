@@ -37,5 +37,8 @@ public:
 public:
 	// 体力ゲージのセットアップ
 	void SetupHPGauge(const int32 InMaxHP);
+
+	// 現在の体力をセット
+	void SetNowHP(const int32 InNowHP);
 	
 };

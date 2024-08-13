@@ -3,6 +3,7 @@
 
 #include "UI/HPGaugeWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 #define LOCTEXT_NAMESPACE "HPGaugeWidget"
@@ -26,6 +27,8 @@ bool UHPGaugeWidget::Initialize()
     //SetMaxHPText(0000);
     //SetNowHPText(0000);
 
+    HPGauge->SetPercent(1.f);
+
     return true;
 }
 
@@ -41,6 +44,7 @@ void UHPGaugeWidget::SetMaxHPText(const int32 InMaxHP)
     FText text = FText::FromString(FString::Printf(TEXT("%4d"), InMaxHP));
 
     MaxHPText->SetText(text);    
+    MaxHP = InMaxHP;
 }
 
 // 現在のHPのテキストのセット
@@ -54,4 +58,34 @@ void UHPGaugeWidget::SetNowHPText(const int32 InNowHP)
     FText text = FText::FromString(FString::Printf(TEXT("%4d"), InNowHP));
 
     NowHPText->SetText(text);
+    NowHP = InNowHP;
+}
+
+// セットアップ
+void UHPGaugeWidget::Setup(const int32 InMaxHP)
+{
+    SetMaxHPText(InMaxHP);
+    SetNowHP(InMaxHP);
+
+}
+
+// 現在のHPのセット
+void UHPGaugeWidget::SetNowHP(const int32 InNowHP)
+{
+    SetNowHPText(InNowHP);
+
+      UpdateHPGauge();
+}
+
+// HPゲージの更新
+void UHPGaugeWidget::UpdateHPGauge()
+{
+    if (!HPGauge)
+    {
+        return;
+    }
+
+    float percent = (float)NowHP / (float)MaxHP;
+    UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(percent));
+    HPGauge->SetPercent(percent);
 }
