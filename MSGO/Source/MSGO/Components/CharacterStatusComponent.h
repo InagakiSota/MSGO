@@ -9,7 +9,7 @@
 #include "CharacterStatusComponent.generated.h"
 
 class AMSGOCharacter;
-
+class UMSGOUIManager;
 
 // ブースト計算用クラス
 UCLASS()
@@ -179,6 +179,10 @@ public:
 
 	// 被弾処理
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
+
+private:
+	//UIマネージャーの取得
+	UMSGOUIManager* GetUIManager();
 
 public:
 	FOnOverHeatDelegate OnOverHeatDelegate;

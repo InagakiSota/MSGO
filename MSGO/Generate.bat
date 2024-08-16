@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe" /projectfiles "G:\WorkSpace\UE5\MSGO\MSGO\MSGO.uproject"
+"C:\Program Files (x86)\Epic Games\Launcher\Engine\Binaries\Win64\UnrealVersionSelector.exe" /projectfiles "D:\WorkSpace\UE5\MSGO\MSGO\MSGO.uproject"

@@ -40,5 +40,11 @@ public:
 
 	// 現在の体力をセット
 	void SetNowHP(const int32 InNowHP);
+
+	// ブーストゲージのセットアップ
+	void SetupBoostGauge(const int32 InMaxBoost);
+
+	// 現在のブースト容量をセット
+	void SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat);
 	
 };

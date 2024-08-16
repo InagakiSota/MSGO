@@ -23,7 +23,6 @@ void AMSGOHud::BeginPlay()
    
         // ViewPort‚É’Ç‰Á
         UIRef->AddToViewport(0);
-
     }
 
     AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
