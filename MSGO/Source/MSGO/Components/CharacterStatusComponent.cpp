@@ -349,6 +349,12 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	}
 
 	uiManager->SetNowHP(NowHP);
+
+	if (NowHP <= 0)
+	{
+		NowHP = 0;
+		GetOwner()->Destroy();
+	}
 }
 
 // UIマネージャーの取得

@@ -8,7 +8,7 @@ public class MSGO : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HeadMountedDisplay"/*, "MSGO_API"*/ });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HeadMountedDisplay", "GameplayAbilities", "GameplayTags", "GameplayTasks"/*, "MSGO_API"*/ });
 		
 		// エディタ専用にUnrealEdモジュールを追加
 		if (Target.bBuildEditor)

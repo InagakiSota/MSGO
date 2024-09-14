@@ -93,7 +93,6 @@ void UHPGaugeWidget::UpdateHPGauge()
 
     float percent = (float)NowHP / (float)MaxHP;
 
-    //UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(percent));
     HPGauge->SetPercent(percent);
 
     HPGauge->SetFillColorAndOpacity(percent > 0.15 ? FColor(0, 235, 215) : FLinearColor::Red);
