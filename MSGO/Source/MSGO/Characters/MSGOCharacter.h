@@ -253,6 +253,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+public:
 	// キャラクターステータスコンポーネントの取得
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UCharacterStatusComponent* GetCharacterStatusComponent()

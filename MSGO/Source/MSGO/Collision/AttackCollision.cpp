@@ -77,10 +77,6 @@ bool AAttackCollision::WakeObject(const FAttackParameter& InAttackParam, const F
 	// 攻撃パラメータ取得
 	AttackParam = InAttackParam;
 
-	// コリジョンパラメータからサイズのセットアップ
-	BoxCollision->SetBoxExtent(AttackParam.CollisionParam.CollisionSize);
-	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	BoxCollision->SetComponentTickEnabled(true);
 
 	// 移動パラメータから初期座標、初期角度をセット
 	SetActorLocation(AttackParam.MovementParam.StartPos);
@@ -105,6 +101,12 @@ bool AAttackCollision::WakeObject(const FAttackParameter& InAttackParam, const F
 	MoveTotalSeconds = 0.0f;
 
 	bIsUsing = true;
+
+	// コリジョンパラメータからサイズのセットアップ
+	BoxCollision->SetBoxExtent(AttackParam.CollisionParam.CollisionSize);
+	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BoxCollision->SetComponentTickEnabled(true);
+
 
 	return true;
 }

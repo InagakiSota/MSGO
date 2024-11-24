@@ -7,6 +7,7 @@
 #include "MSGOUIManager.generated.h"
 
 class UMyHudWidget;
+class AMSGOCharacter;
 
 /**
  * 
@@ -21,7 +22,15 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMyHudWidget> HudWidget;
 
+	// プレイヤーキャラクター
+	UPROPERTY()
+	TObjectPtr<AMSGOCharacter> PlayerCharacter;
+
 public:
+	// ゲーム開始時のセットアップ
+	// @param		InCharacter	操作対象のプレイヤーキャラクター
+	void SetupOnBeginPlay(AMSGOCharacter* InCharacter);
+
 	UFUNCTION(BlueprintCallable)
 	UMyHudWidget* GetHudWidget()
 	{
@@ -34,9 +43,25 @@ public:
 		HudWidget = InHudWidget;
 	}
 
+	UFUNCTION(BlueprintCallable)
+	AMSGOCharacter* GetPlayuerCharacter()
+	{
+		return PlayerCharacter;
+	}
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerCharacter(AMSGOCharacter* InCharacter)
+	{
+		PlayerCharacter = InCharacter;
+	}
+
+
 public:
 	// 体力ゲージのセットアップ
 	void SetupHPGauge(const int32 InMaxHP);
+
+	// 体力ゲージのセット
+	void SetupHP(const int32 InMaxHP, const int32 InNowHP);
 
 	// 現在の体力をセット
 	void SetNowHP(const int32 InNowHP);
@@ -46,5 +71,6 @@ public:
 
 	// 現在のブースト容量をセット
 	void SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat);
+
 	
 };

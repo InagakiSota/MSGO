@@ -122,6 +122,7 @@ class MSGO_API UCharacterStatusComponent : public UActorComponent
 public:
 
 	DECLARE_MULTICAST_DELEGATE(FOnOverHeatDelegate);
+	DECLARE_MULTICAST_DELEGATE_TwoParams(FOnChangeHPDelegate, const int32, const int32);
 
 	// Sets default values for this component's properties
 	UCharacterStatusComponent();
@@ -185,8 +186,10 @@ private:
 	UMSGOUIManager* GetUIManager();
 
 public:
+	// オーバーヒート時のデリゲート
 	FOnOverHeatDelegate OnOverHeatDelegate;
-
+	// HP変更時のデリゲート
+	FOnChangeHPDelegate OnChangeHPDelegate;
 protected:
 	// 現在のHP
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
@@ -221,8 +224,6 @@ protected:
 	int32 PrevBoostCap;
 
 private:
-	// デリゲートを再生したかのフラグ
-	bool bIsBroadcastDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "CharacterStatus")

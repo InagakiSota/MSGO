@@ -172,12 +172,12 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	, NowDownPoint(0)
 	, MaxDownPoint(0)
 	, OwnerCharacter(nullptr)
-	, bIsBroadcastDelegate(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	OnChangeHPDelegate.Clear();
 }
 
 
@@ -218,11 +218,9 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	// ブースト容量が0になったらデリゲートを実行
 	if (NowBoostCap <= 0 && PrevBoostCap != NowBoostCap)
 	{
-		// 登録されていればデリゲートを実行
 		if (OnOverHeatDelegate.IsBound())
 		{
 			OnOverHeatDelegate.Broadcast();
-			//bIsBroadcastDelegate = true;
 		}
 	}
 
@@ -257,6 +255,11 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 
 	uiManager->SetupHPGauge(MaxHP);
 	uiManager->SetupBoostGauge(MaxBoostCap);
+
+	if (OnChangeHPDelegate.IsBound())
+	{
+		OnChangeHPDelegate.Broadcast(MaxHP, NowHP);
+	}
 }
 
 // ブースト消費開始
@@ -355,6 +358,12 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 		NowHP = 0;
 		GetOwner()->Destroy();
 	}
+
+	if (OnChangeHPDelegate.IsBound())
+	{
+		OnChangeHPDelegate.Broadcast(MaxHP, NowHP);
+	}
+
 }
 
 // UIマネージャーの取得

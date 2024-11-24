@@ -5,6 +5,29 @@
 #include "UI/MyHudWidget.h"
 #include "UI/HPGaugeWidget.h"
 #include "UI/BoostGaugeWidget.h"
+#include "Components/CharacterStatusComponent.h"
+#include "Characters/MSGOCharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+// ゲーム開始時のセットアップ
+// @param	InCharacter	操作対象のプレイヤーキャラクター
+void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
+{
+    if (!InCharacter)
+    {
+        return;
+    }
+
+    PlayerCharacter = InCharacter;
+
+    UCharacterStatusComponent* statusComponent = PlayerCharacter->GetCharacterStatusComponent();
+    if (!statusComponent)
+    {
+        return;
+    }
+
+    statusComponent->OnChangeHPDelegate.AddUObject(this, &UMSGOUIManager::SetupHP);
+}
 
 // 体力ゲージのセットアップ
 void UMSGOUIManager::SetupHPGauge(const int32 InMaxHP)
@@ -72,5 +95,13 @@ void UMSGOUIManager::SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat)
     }
 
     boostGauge->SetNowBoost(InNowBoost, bIsOverHeat);
+
+}
+
+// 体力ゲージのセット
+void UMSGOUIManager::SetupHP(const int32 InMaxHP, const int32 InNowHP)
+{
+    UKismetSystemLibrary::PrintString(this, FString::FromInt(InMaxHP));
+    UKismetSystemLibrary::PrintString(this, FString::FromInt(InNowHP));
 
 }
