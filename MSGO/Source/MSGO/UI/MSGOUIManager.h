@@ -60,8 +60,8 @@ public:
 	// 体力ゲージのセットアップ
 	void SetupHPGauge(const int32 InMaxHP);
 
-	// 体力ゲージのセット
-	void SetupHP(const int32 InMaxHP, const int32 InNowHP);
+	// 体力ゲージの更新
+	void UpdateHPGauge(const int32 InMaxHP, const int32 InNowHP);
 
 	// 現在の体力をセット
 	void SetNowHP(const int32 InNowHP);

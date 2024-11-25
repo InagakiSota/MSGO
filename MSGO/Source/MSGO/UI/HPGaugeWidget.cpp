@@ -80,18 +80,21 @@ void UHPGaugeWidget::SetNowHP(const int32 InNowHP)
         NowHP = 0;
     }
 
-    UpdateHPGauge();
+    //UpdateHPGauge();
 }
 
 // HPゲージの更新
-void UHPGaugeWidget::UpdateHPGauge()
+void UHPGaugeWidget::UpdateHPGauge(int32 InMaxHP, int32 InNowHP)
 {
     if (!HPGauge)
     {
         return;
     }
 
-    float percent = (float)NowHP / (float)MaxHP;
+    SetNowHPText(InNowHP);
+    SetMaxHPText(InMaxHP);
+
+    float percent = (float)InNowHP / (float)InMaxHP;
 
     HPGauge->SetPercent(percent);
 

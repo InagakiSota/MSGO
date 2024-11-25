@@ -43,8 +43,9 @@ protected:
 
 	bool Initialize() override;
 
+public:
 	// HPゲージの更新
-	void UpdateHPGauge();
+	void UpdateHPGauge(int32 InMaxHP, int32 InNowHP);
 	
 protected:
 	// 最大HPのテキスト

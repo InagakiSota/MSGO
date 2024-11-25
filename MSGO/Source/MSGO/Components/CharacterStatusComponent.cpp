@@ -253,7 +253,9 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 		return;
 	}
 
+#if 0
 	uiManager->SetupHPGauge(MaxHP);
+#endif
 	uiManager->SetupBoostGauge(MaxBoostCap);
 
 	if (OnChangeHPDelegate.IsBound())
@@ -344,6 +346,7 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	NowHP -= damage;
 	NowDownPoint -= InAttackPowerParam.DownPoint;
 
+#if 0
 	// UIに反映
 	UMSGOUIManager* uiManager = GetUIManager();
 	if (!uiManager)
@@ -352,6 +355,7 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	}
 
 	uiManager->SetNowHP(NowHP);
+#endif
 
 	if (NowHP <= 0)
 	{
