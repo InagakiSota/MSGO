@@ -27,6 +27,9 @@ void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
     }
 
     statusComponent->OnChangeHPDelegate.AddUObject(this, &UMSGOUIManager::UpdateHPGauge);
+    statusComponent->OnSetupHPDelegate.AddUObject(this, &UMSGOUIManager::SetupHPGauge);
+    statusComponent->OnChangeBoostDelegate.AddUObject(this, &UMSGOUIManager::SetNowBoost);
+    statusComponent->OnSetupBoostDelegate.AddUObject(this, &UMSGOUIManager::SetupBoostGauge);
 }
 
 // 体力ゲージのセットアップ
@@ -46,6 +49,7 @@ void UMSGOUIManager::SetupHPGauge(const int32 InMaxHP)
     hpGauge->Setup(InMaxHP);
 }
 
+#if 0
 // 現在の体力をセット
 void UMSGOUIManager::SetNowHP(const int32 InNowHP)
 {
@@ -62,6 +66,7 @@ void UMSGOUIManager::SetNowHP(const int32 InNowHP)
 
     hpGauge->SetNowHP(InNowHP);
 }
+#endif
 
 // ブーストゲージのセットアップ
 void UMSGOUIManager::SetupBoostGauge(const int32 InMaxBoost)
@@ -99,7 +104,7 @@ void UMSGOUIManager::SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat)
 }
 
 // 体力ゲージの更新
-void UMSGOUIManager::UpdateHPGauge(const int32 InMaxHP, const int32 InNowHP)
+void UMSGOUIManager::UpdateHPGauge(const int32 InNowHP)
 {
     if (!HudWidget)
     {
@@ -112,7 +117,7 @@ void UMSGOUIManager::UpdateHPGauge(const int32 InMaxHP, const int32 InNowHP)
         return;
     }
 
-    hpGauge->UpdateHPGauge(InMaxHP, InNowHP);
+    hpGauge->UpdateHPGauge(InNowHP);
 
 
 }

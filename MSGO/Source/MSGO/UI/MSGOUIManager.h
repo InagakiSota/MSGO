@@ -61,10 +61,12 @@ public:
 	void SetupHPGauge(const int32 InMaxHP);
 
 	// 体力ゲージの更新
-	void UpdateHPGauge(const int32 InMaxHP, const int32 InNowHP);
+	void UpdateHPGauge(const int32 InNowHP);
 
+#if 0
 	// 現在の体力をセット
 	void SetNowHP(const int32 InNowHP);
+#endif
 
 	// ブーストゲージのセットアップ
 	void SetupBoostGauge(const int32 InMaxBoost);

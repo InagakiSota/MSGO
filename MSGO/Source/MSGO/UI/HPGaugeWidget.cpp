@@ -21,12 +21,6 @@ bool UHPGaugeWidget::Initialize()
     {
         return false;
     }
-   
-    //FText text = FText::FromString("000");
-    //MaxHPText->SetText(text);
-
-    //SetMaxHPText(0000);
-    //SetNowHPText(0000);
 
     HPGauge->SetPercent(1.f);
 
@@ -66,7 +60,7 @@ void UHPGaugeWidget::Setup(const int32 InMaxHP)
     SetNowHP(InMaxHP);
 
     MaxHP = NowHP = InMaxHP;
-
+    UpdateHPGauge(MaxHP);
 }
 
 // 現在のHPのセット
@@ -84,7 +78,7 @@ void UHPGaugeWidget::SetNowHP(const int32 InNowHP)
 }
 
 // HPゲージの更新
-void UHPGaugeWidget::UpdateHPGauge(int32 InMaxHP, int32 InNowHP)
+void UHPGaugeWidget::UpdateHPGauge(int32 InNowHP)
 {
     if (!HPGauge)
     {
@@ -92,9 +86,15 @@ void UHPGaugeWidget::UpdateHPGauge(int32 InMaxHP, int32 InNowHP)
     }
 
     SetNowHPText(InNowHP);
-    SetMaxHPText(InMaxHP);
+    SetMaxHPText(MaxHP);
 
-    float percent = (float)InNowHP / (float)InMaxHP;
+    NowHP = InNowHP;
+    if (NowHP < 0)
+    {
+        NowHP = 0;
+    }
+
+    float percent = (float)InNowHP / (float)MaxHP;
 
     HPGauge->SetPercent(percent);
 

@@ -178,6 +178,9 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	OnChangeHPDelegate.Clear();
+	OnSetupHPDelegate.Clear();
+	OnChangeBoostDelegate.Clear();
+	OnSetupBoostDelegate.Clear();
 }
 
 
@@ -226,12 +229,19 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	PrevBoostCap = NowBoostCap;
 
+#if 0
 	// UIまわりのセットアップ
 	UMSGOUIManager* uiManager = GetUIManager();
 	if (uiManager)
 	{
 		uiManager->SetNowBoost(NowBoostCap,GetIsOverHeat());
 	}
+#endif
+	if (OnChangeBoostDelegate.IsBound())
+	{
+		OnChangeBoostDelegate.Broadcast(NowBoostCap, GetIsOverHeat());
+	}
+
 }
 
 // パラメータのセットアップ
@@ -255,12 +265,15 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 
 #if 0
 	uiManager->SetupHPGauge(MaxHP);
-#endif
 	uiManager->SetupBoostGauge(MaxBoostCap);
-
-	if (OnChangeHPDelegate.IsBound())
+#endif
+	if (OnSetupHPDelegate.IsBound())
 	{
-		OnChangeHPDelegate.Broadcast(MaxHP, NowHP);
+		OnSetupHPDelegate.Broadcast(MaxHP);
+	}
+	if (OnSetupBoostDelegate.IsBound())
+	{
+		OnSetupBoostDelegate.Broadcast(MaxBoostCap);
 	}
 }
 
@@ -363,9 +376,10 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 		GetOwner()->Destroy();
 	}
 
+	// HP変更時のデリゲートを実行
 	if (OnChangeHPDelegate.IsBound())
 	{
-		OnChangeHPDelegate.Broadcast(MaxHP, NowHP);
+		OnChangeHPDelegate.Broadcast(NowHP);
 	}
 
 }

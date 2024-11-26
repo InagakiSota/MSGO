@@ -29,7 +29,7 @@ protected:
 
 public:
 	// セットアップ
-	// @param			InMaxHP		現在の体力
+	// @param			InMaxHP		最大
 	UFUNCTION(BlueprintCallable)
 	void Setup(const int32 InMaxHP);
 
@@ -45,7 +45,7 @@ protected:
 
 public:
 	// HPゲージの更新
-	void UpdateHPGauge(int32 InMaxHP, int32 InNowHP);
+	void UpdateHPGauge(int32 InNowHP);
 	
 protected:
 	// 最大HPのテキスト
