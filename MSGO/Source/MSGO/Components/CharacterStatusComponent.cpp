@@ -229,14 +229,7 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	PrevBoostCap = NowBoostCap;
 
-#if 0
-	// UIまわりのセットアップ
-	UMSGOUIManager* uiManager = GetUIManager();
-	if (uiManager)
-	{
-		uiManager->SetNowBoost(NowBoostCap,GetIsOverHeat());
-	}
-#endif
+	// ブーストゲージの更新
 	if (OnChangeBoostDelegate.IsBound())
 	{
 		OnChangeBoostDelegate.Broadcast(NowBoostCap, GetIsOverHeat());
@@ -257,16 +250,6 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 	NowBoostCap = MaxBoostCap = BoostCalculator->GetNowBoostCap();
 
 	// UIまわりのセットアップ
-	UMSGOUIManager* uiManager = GetUIManager();
-	if (!uiManager)
-	{
-		return;
-	}
-
-#if 0
-	uiManager->SetupHPGauge(MaxHP);
-	uiManager->SetupBoostGauge(MaxBoostCap);
-#endif
 	if (OnSetupHPDelegate.IsBound())
 	{
 		OnSetupHPDelegate.Broadcast(MaxHP);
@@ -359,16 +342,6 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	NowHP -= damage;
 	NowDownPoint -= InAttackPowerParam.DownPoint;
 
-#if 0
-	// UIに反映
-	UMSGOUIManager* uiManager = GetUIManager();
-	if (!uiManager)
-	{
-		return;
-	}
-
-	uiManager->SetNowHP(NowHP);
-#endif
 
 	if (NowHP <= 0)
 	{
@@ -382,17 +355,4 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 		OnChangeHPDelegate.Broadcast(NowHP);
 	}
 
-}
-
-// UIマネージャーの取得
-UMSGOUIManager* UCharacterStatusComponent::GetUIManager()
-{
-	AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
-	if (!gameState)
-	{
-		return nullptr;
-	}
-	UMSGOUIManager* uiManager = gameState->GetUIManager();
-
-	return uiManager;
 }

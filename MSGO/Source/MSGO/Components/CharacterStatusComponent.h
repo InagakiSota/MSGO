@@ -184,9 +184,6 @@ public:
 	// 被弾処理
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
-private:
-	//UIマネージャーの取得
-	UMSGOUIManager* GetUIManager();
 
 public:
 	// オーバーヒート時のデリゲート
