@@ -41,3 +41,9 @@ void AMSGOGameState::BeginDestroy()
         //AttackCollisionPool->BeginDestroy();
     }
 }
+
+AMSGOGameState* AMSGOGameState::Get(const UObject* WorldContextObject)
+{
+    UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    return World ? Cast<AMSGOGameState>(World->GetGameState()) : nullptr;
+}

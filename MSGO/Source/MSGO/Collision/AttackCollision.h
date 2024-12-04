@@ -42,6 +42,12 @@ public:
 	// 使用中フラグの取得
 	bool GetIsUsing() { return bIsUsing; }
 
+	// アクティブかどうかを取得
+	bool IsActive() const
+	{
+		return MoveTotalSeconds > 0.f && bIsUsing;
+	}
+
 	// 使用者の参照を取得
 	AMSGOCharacter* GetOwnerCharacter()
 	{
@@ -75,6 +81,9 @@ protected:
 
 	// 使用中かのフラグ
 	bool bIsUsing;
+
+	// アクティブかのフラグ
+	bool bIsActive;
 
 	// 攻撃パラメータ
 	FAttackParameter AttackParam;

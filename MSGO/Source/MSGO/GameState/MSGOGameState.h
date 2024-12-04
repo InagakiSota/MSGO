@@ -32,17 +32,25 @@ public:
 
 	virtual void BeginDestroy() override;
 
+	UFUNCTION(BlueprintPure,Category = "MSGO|GameState", meta = (DisplayName = "Get MSGO Game State", WorldContext = "WorldContextObject"))
+	static class AMSGOGameState* Get(const UObject* WorldContextObject);
+
+	///** Returns the current GameStateBase or Null if it can't be retrieved */
+	//UFUNCTION(BlueprintPure, Category = "Game", meta = (WorldContext = "WorldContextObject"))
+	//static ENGINE_API class AGameStateBase* GetGameState(const UObject* WorldContextObject);
+
+
 public:
 	// UIマネージャーの取得
 	UFUNCTION(BlueprintCallable)
-	UMSGOUIManager* GetUIManager()
+	UMSGOUIManager* GetUIManager() const
 	{
 		return UIManager;
 	}
 
 	// 攻撃コリジョンプールの取得
 	UFUNCTION(BlueprintCallable)
-	UAttackCollisionPool* GetAttackCollisionPool()
+	UAttackCollisionPool* GetAttackCollisionPool() const
 	{
 		return AttackCollisionPool;
 	}

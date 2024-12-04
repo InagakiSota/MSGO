@@ -33,4 +33,7 @@ public:
 	// ゲーム終了時処理
 	void BeginDestroy();
 
+	// 攻撃コリジョン取得
+	UFUNCTION(BlueprintCallable)
+	AAttackCollision* GetAttackCollision() const;
 };

@@ -45,3 +45,33 @@ void UAttackCollisionPool::BeginDestroy()
     AttackCollisions.Empty();
 }
 
+// 攻撃コリジョンを取得
+AAttackCollision* UAttackCollisionPool::GetAttackCollision() const
+{
+    for (int32 idx = 0; idx < AttackCollisionPoolNum; idx++)
+    {
+        // 無効な要素数ならスルー
+        if (!AttackCollisions.IsValidIndex(idx))
+        {
+            continue;
+        }
+
+        // Nullならスルー
+        if (AttackCollisions[idx] == nullptr || !IsValid(AttackCollisions[idx]))
+        {
+            continue;
+        }
+
+        // 使用中ならスルー
+        if (AttackCollisions[idx]->IsActive())
+        {
+            continue;
+        }
+
+        // ここまで来たら返す
+        return AttackCollisions[idx];
+    }
+
+    return nullptr;
+}
+
