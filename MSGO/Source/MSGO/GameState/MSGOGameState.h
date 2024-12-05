@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 
 class UMSGOUIManager;
 class UAttackCollisionPool;
+class AAttackCollision;
 
 /**
  * 
@@ -18,11 +19,11 @@ class MSGO_API AMSGOGameState : public AGameStateBase
 	GENERATED_BODY()
 
 protected:
-	// UIƒ}ƒl[ƒWƒƒ[
+	// UIãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼
 	UPROPERTY()
 	TObjectPtr<UMSGOUIManager> UIManager;
 
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“ƒIƒuƒWƒFƒNƒgƒv[ƒ‹
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«
 	UPROPERTY()
 	TObjectPtr<UAttackCollisionPool> AttackCollisionPool;
 
@@ -41,18 +42,21 @@ public:
 
 
 public:
-	// UIƒ}ƒl[ƒWƒƒ[‚Ìæ“¾
+	// UIãƒãƒãƒ¼ã‚¸ãƒ£ãƒ¼ã®å–å¾—
 	UFUNCTION(BlueprintCallable)
 	UMSGOUIManager* GetUIManager() const
 	{
 		return UIManager;
 	}
 
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“ƒv[ƒ‹‚Ìæ“¾
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒ—ãƒ¼ãƒ«ã®å–å¾—
 	UFUNCTION(BlueprintCallable)
 	UAttackCollisionPool* GetAttackCollisionPool() const
 	{
 		return AttackCollisionPool;
 	}
-	
+
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ãƒ—ãƒ¼ãƒ«ã‹ã‚‰æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’å–å¾—
+	UFUNCTION(BlueprintPure)
+	AAttackCollision* GetAttackCollisionFromPool();
 };

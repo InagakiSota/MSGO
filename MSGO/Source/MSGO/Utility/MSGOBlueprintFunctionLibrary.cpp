@@ -1,9 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
 
-// ƒtƒŒ[ƒ€‚ğ•b”‚É•ÏŠ·(60fps)
+// ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç§’æ•°ã«å¤‰æ›(60fps)
 float UMSGOBlueprintFunctionLibrary::FrameToSeconds(const int32 InFrame)
 {
     float oneFrameSeconds = 1.0f / 60.f;
@@ -11,7 +11,7 @@ float UMSGOBlueprintFunctionLibrary::FrameToSeconds(const int32 InFrame)
     return oneFrameSeconds * InFrame;
 }
 
-// •b”‚ğƒtƒŒ[ƒ€‚É•ÏŠ·(60fps)
+// ç§’æ•°ã‚’ãƒ•ãƒ¬ãƒ¼ãƒ ã«å¤‰æ›(60fps)
 int32 UMSGOBlueprintFunctionLibrary::SecondsToFrame(const float InSeconds)
 {
     float oneFrameSeconds = 1.0f / 60.f;
@@ -19,7 +19,7 @@ int32 UMSGOBlueprintFunctionLibrary::SecondsToFrame(const float InSeconds)
     return int32(InSeconds / oneFrameSeconds);
 }
 
-// ƒXƒgƒŠƒ“ƒOƒe[ƒuƒ‹‚ğCSV‚ÉƒGƒNƒXƒ|[ƒg
+// ã‚¹ãƒˆãƒªãƒ³ã‚°ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’CSVã«ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆ
 bool UMSGOBlueprintFunctionLibrary::ExportCSVFromCSVString(const FString& CSVString, FString FileName)
 {
     return FFileHelper::SaveStringToFile(CSVString, *FileName);

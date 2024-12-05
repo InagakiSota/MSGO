@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/MSGOHud.h"
@@ -10,7 +10,7 @@
 
 void AMSGOHud::BeginPlay()
 {
-    // WidgetBlueprint‚ÌƒNƒ‰ƒX‚ğæ“¾
+    // WidgetBlueprintã®ã‚¯ãƒ©ã‚¹ã‚’å–å¾—
     FString path = TEXT("/Game/UI/Widget/WBP_MSGOHud.WBP_MSGOHud_C");
     TSubclassOf<UMyHudWidget> widgetClass = TSoftClassPtr<UMyHudWidget>(FSoftObjectPath(*path)).LoadSynchronous();
 
@@ -18,10 +18,10 @@ void AMSGOHud::BeginPlay()
 
     if (widgetClass && playerController)
     {
-        // Widget‚ğì¬
+        // Widgetã‚’ä½œæˆ
         UIRef = Cast<UMyHudWidget>(UWidgetBlueprintLibrary::Create(GetWorld(), widgetClass, playerController));
    
-        // ViewPort‚É’Ç‰Á
+        // ViewPortã«è¿½åŠ 
         UIRef->AddToViewport(0);
     }
 

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,22 +18,25 @@ class MSGO_API UAttackCollisionPool : public UObject
 	GENERATED_BODY()
 
 public:
-	// ƒIƒuƒWƒFƒNƒgƒv[ƒ‹‚ÌÅ‘å”
+	// ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãƒ—ãƒ¼ãƒ«ã®æœ€å¤§æ•°
 	static const int32 AttackCollisionPoolNum;
 
 public:
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚Ì”z—ñ
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã®é…åˆ—
 	UPROPERTY()
 	TArray<TObjectPtr<AAttackCollision>> AttackCollisions;
 
 public:
-	// ƒQ[ƒ€ŠJnˆ—
+	// ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚å‡¦ç†
 	void BeginPlay();
 
-	// ƒQ[ƒ€I—¹ˆ—
+	// ã‚²ãƒ¼ãƒ çµ‚äº†æ™‚å‡¦ç†
 	void BeginDestroy();
 
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“æ“¾
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³å–å¾—
 	UFUNCTION(BlueprintCallable)
 	AAttackCollision* GetAttackCollision() const;
+
+protected:
+	virtual UWorld* GetWorld() const override;
 };

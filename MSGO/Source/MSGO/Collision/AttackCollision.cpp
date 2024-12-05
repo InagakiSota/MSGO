@@ -40,6 +40,8 @@ AAttackCollision::AAttackCollision()
 
 	bIsUsing = false;
 	MoveTotalSeconds = 0.0f;
+
+	this->SleepObject();
 }
 
 // Called when the game starts or when spawned

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Collision/DamageCollision.h"
@@ -51,7 +51,7 @@ void UDamageCollision::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
-// ƒRƒŠƒWƒ‡ƒ“‚ÌƒZƒbƒgƒAƒbƒv
+// ã‚³ãƒªã‚¸ãƒ§ãƒ³ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 bool UDamageCollision::SetupCollision(const FDamageCollisionParameter& InDamageCollParam)
 {
 	this->SetBoxExtent(InDamageCollParam.CollisionSize);
@@ -59,30 +59,30 @@ bool UDamageCollision::SetupCollision(const FDamageCollisionParameter& InDamageC
 	return true;
 }
 
-// ƒI[ƒo[ƒ‰ƒbƒvŠJnˆ—(”í’eˆ—)
+// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—é–‹å§‹å‡¦ç†(è¢«å¼¾å‡¦ç†)
 void UDamageCollision::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//UKismetSystemLibrary::PrintString(this, "BeginOverlap");
 
-	// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ªƒqƒbƒg‚µ‚½‚©‚ğƒ`ƒFƒbƒN
+	// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ãŒãƒ’ãƒƒãƒˆã—ãŸã‹ã‚’ãƒã‚§ãƒƒã‚¯
 	if (AAttackCollision* attackColl = Cast<AAttackCollision>(Other))
 	{
-		// ©g‚Ìg—pÒ‚ğæ“¾
+		// è‡ªèº«ã®ä½¿ç”¨è€…ã‚’å–å¾—
 		AMSGOCharacter* ownerChara = Cast<AMSGOCharacter>(GetOwner());
 		if (!ownerChara)
 		{
 			return;
 		}
 
-		//// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚Ìg—pÒ‚ğæ“¾
+		//// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã®ä½¿ç”¨è€…ã‚’å–å¾—
 		//AMSGOCharacter* attackOwner = attackColl->GetOwnerCharacter();
-		////@UŒ‚‚Ìg—pÒ‚ªNullA‚à‚µ‚­‚Í©g‚Ìg—pÒ‚Æ“¯‚¶ê‡‚Íˆ—‚µ‚È‚¢
+		////ã€€æ”»æ’ƒã®ä½¿ç”¨è€…ãŒNullã€ã‚‚ã—ãã¯è‡ªèº«ã®ä½¿ç”¨è€…ã¨åŒã˜å ´åˆã¯å‡¦ç†ã—ãªã„
 		//if (!attackOwner || ownerChara == attackOwner)
 		//{
 		//	return;
 		//}
 
-		// g—pÒ‚Æ”í’eÒ‚ÌID‚ª“¯‚¶ê‡‚Íˆ—‚µ‚È‚¢
+		// ä½¿ç”¨è€…ã¨è¢«å¼¾è€…ã®IDãŒåŒã˜å ´åˆã¯å‡¦ç†ã—ãªã„
 		if (attackColl->GetOwnerTeamID() == ownerChara->MachineTeamID)
 		{
 			return;
@@ -90,13 +90,13 @@ void UDamageCollision::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActo
 
 		//if(owner)
 
-		// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ğíœi‚¢‚Á‚½‚ñj
+		// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’å‰Šé™¤ï¼ˆã„ã£ãŸã‚“ï¼‰
 		attackColl->SleepObject();
 
-		// UŒ‚Ò‚Æƒ`[ƒ€ID‚ªˆÙ‚È‚éê‡‚Íƒ_ƒ[ƒWˆ—
+		// æ”»æ’ƒè€…ã¨ãƒãƒ¼ãƒ IDãŒç•°ãªã‚‹å ´åˆã¯ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†
 		if (attackColl->GetOwnerTeamID().TeamID != ownerChara->MachineTeamID.TeamID)
 		{
-			// ‚±‚±‚Éƒ_ƒ[ƒWˆ—‚ğ‘‚­
+			// ã“ã“ã«ãƒ€ãƒ¡ãƒ¼ã‚¸å‡¦ç†ã‚’æ›¸ã
 			ownerChara->AddDamage(attackColl->GetAttackPowerParameter());
 		}
 	}

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/MSGOUIManager.h"
@@ -9,8 +9,8 @@
 #include "Characters/MSGOCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-// ƒQ[ƒ€ŠJn‚ÌƒZƒbƒgƒAƒbƒv
-// @param	InCharacter	‘€ì‘ÎÛ‚ÌƒvƒŒƒCƒ„[ƒLƒƒƒ‰ƒNƒ^[
+// ã‚²ãƒ¼ãƒ é–‹å§‹æ™‚ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+// @param	InCharacter	æ“ä½œå¯¾è±¡ã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼
 void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
 {
     if (!InCharacter)
@@ -32,7 +32,7 @@ void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
     statusComponent->OnSetupBoostDelegate.AddUObject(this, &UMSGOUIManager::SetupBoostGauge);
 }
 
-// ‘Ì—ÍƒQ[ƒW‚ÌƒZƒbƒgƒAƒbƒv
+// ä½“åŠ›ã‚²ãƒ¼ã‚¸ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 void UMSGOUIManager::SetupHPGauge(const int32 InMaxHP)
 {
     if (!HudWidget)
@@ -50,7 +50,7 @@ void UMSGOUIManager::SetupHPGauge(const int32 InMaxHP)
 }
 
 #if 0
-// Œ»İ‚Ì‘Ì—Í‚ğƒZƒbƒg
+// ç¾åœ¨ã®ä½“åŠ›ã‚’ã‚»ãƒƒãƒˆ
 void UMSGOUIManager::SetNowHP(const int32 InNowHP)
 {
     if (!HudWidget)
@@ -68,7 +68,7 @@ void UMSGOUIManager::SetNowHP(const int32 InNowHP)
 }
 #endif
 
-// ƒu[ƒXƒgƒQ[ƒW‚ÌƒZƒbƒgƒAƒbƒv
+// ãƒ–ãƒ¼ã‚¹ãƒˆã‚²ãƒ¼ã‚¸ã®ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 void UMSGOUIManager::SetupBoostGauge(const int32 InMaxBoost)
 {
     if (!HudWidget)
@@ -85,7 +85,7 @@ void UMSGOUIManager::SetupBoostGauge(const int32 InMaxBoost)
     boostGauge->Setup(InMaxBoost);
 }
 
-// Œ»İ‚Ìƒu[ƒXƒg—e—Ê‚ğƒZƒbƒg
+// ç¾åœ¨ã®ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡ã‚’ã‚»ãƒƒãƒˆ
 void UMSGOUIManager::SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat)
 {
     if (!HudWidget)
@@ -103,7 +103,7 @@ void UMSGOUIManager::SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat)
 
 }
 
-// ‘Ì—ÍƒQ[ƒW‚ÌXV
+// ä½“åŠ›ã‚²ãƒ¼ã‚¸ã®æ›´æ–°
 void UMSGOUIManager::UpdateHPGauge(const int32 InNowHP)
 {
     if (!HudWidget)

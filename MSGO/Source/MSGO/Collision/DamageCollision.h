@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool SetupCollision(const FDamageCollisionParameter& InDamageCollParam);
 
-	// ƒI[ƒo[ƒ‰ƒbƒvŠJnˆ—
+	// ã‚ªãƒ¼ãƒãƒ¼ãƒ©ãƒƒãƒ—é–‹å§‹å‡¦ç†
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

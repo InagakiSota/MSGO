@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,15 +15,15 @@ class MSGO_API UMSGOBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	// ƒtƒŒ[ƒ€‚ğ•b”‚É•ÏŠ·(60fps)
+	// ãƒ•ãƒ¬ãƒ¼ãƒ ã‚’ç§’æ•°ã«å¤‰æ›(60fps)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static float FrameToSeconds(const int32 InFrame);
 
-	// •b”‚ğƒtƒŒ[ƒ€‚É•ÏŠ·(60fps)
+	// ç§’æ•°ã‚’ãƒ•ãƒ¬ãƒ¼ãƒ ã«å¤‰æ›(60fps)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static int32 SecondsToFrame(const float InSeconds);
 
-	// ƒXƒgƒŠƒ“ƒOƒe[ƒuƒ‹‚ğCSV‚ÉƒGƒNƒXƒ|[ƒg
+	// ã‚¹ãƒˆãƒªãƒ³ã‚°ãƒ†ãƒ¼ãƒ–ãƒ«ã‚’CSVã«ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆ
 	UFUNCTION(BlueprintCallable)
 	static bool ExportCSVFromCSVString(const FString& CSVString, FString FileName);
 

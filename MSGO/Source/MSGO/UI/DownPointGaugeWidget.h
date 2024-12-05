@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "DownPointGaugeWidget.generated.h"
 
 /**
- * ƒ_ƒEƒ“ƒ|ƒCƒ“ƒgƒQ[ƒW‚ÌƒEƒBƒWƒFƒbƒgƒNƒ‰ƒX
+ * ãƒ€ã‚¦ãƒ³ãƒã‚¤ãƒ³ãƒˆã‚²ãƒ¼ã‚¸ã®ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆã‚¯ãƒ©ã‚¹
  */
 UCLASS()
 class MSGO_API UDownPointGaugeWidget : public UUserWidget

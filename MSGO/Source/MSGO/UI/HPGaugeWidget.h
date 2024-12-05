@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +9,7 @@
 class UTextBlock;
 class UProgressBar;
 /**
- * HPƒQ[ƒW‚ÌƒEƒBƒWƒFƒbƒgƒNƒ‰ƒX
+ * HPã‚²ãƒ¼ã‚¸ã®ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆã‚¯ãƒ©ã‚¹
  */
 UCLASS()
 class MSGO_API UHPGaugeWidget : public UUserWidget
@@ -17,23 +17,23 @@ class MSGO_API UHPGaugeWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	// Å‘åHP‚ÌƒeƒLƒXƒg‚ÌƒZƒbƒg
-	// @param			InMaxHP		Å‘å‘Ì—Í
+	// æœ€å¤§HPã®ãƒ†ã‚­ã‚¹ãƒˆã®ã‚»ãƒƒãƒˆ
+	// @param			InMaxHP		æœ€å¤§ä½“åŠ›
 	UFUNCTION(BlueprintCallable)
 	void SetMaxHPText(const int32 InMaxHP);
 
-	// Œ»İ‚ÌHP‚ÌƒeƒLƒXƒg‚ÌƒZƒbƒg
-	// @param			InNowHP		Œ»İ‚Ì‘Ì—Í
+	// ç¾åœ¨ã®HPã®ãƒ†ã‚­ã‚¹ãƒˆã®ã‚»ãƒƒãƒˆ
+	// @param			InNowHP		ç¾åœ¨ã®ä½“åŠ›
 	UFUNCTION(BlueprintCallable)
 	void SetNowHPText(const int32 InNowHP);
 
 public:
-	// ƒZƒbƒgƒAƒbƒv
-	// @param			InMaxHP		Å‘å
+	// ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+	// @param			InMaxHP		æœ€å¤§
 	UFUNCTION(BlueprintCallable)
 	void Setup(const int32 InMaxHP);
 
-	// Œ»İ‚ÌHP‚ÌƒZƒbƒg
+	// ç¾åœ¨ã®HPã®ã‚»ãƒƒãƒˆ
 	UFUNCTION(BlueprintCallable)
 	void SetNowHP(const int32 InNowHP);
 
@@ -44,25 +44,25 @@ protected:
 	bool Initialize() override;
 
 public:
-	// HPƒQ[ƒW‚ÌXV
+	// HPã‚²ãƒ¼ã‚¸ã®æ›´æ–°
 	void UpdateHPGauge(int32 InNowHP);
 	
 protected:
-	// Å‘åHP‚ÌƒeƒLƒXƒg
+	// æœ€å¤§HPã®ãƒ†ã‚­ã‚¹ãƒˆ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> MaxHPText;
 
-	// Œ»İ‚ÌHP‚ÌƒeƒLƒXƒg
+	// ç¾åœ¨ã®HPã®ãƒ†ã‚­ã‚¹ãƒˆ
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> NowHPText;
 
-	// HPƒQ[ƒW
+	// HPã‚²ãƒ¼ã‚¸
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UProgressBar> HPGauge;
 
-	// Å‘åHP
+	// æœ€å¤§HP
 	int32 MaxHP;
 
-	// Œ»İHP
+	// ç¾åœ¨HP
 	int32 NowHP;
 };

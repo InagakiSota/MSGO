@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "ReticleWidget.generated.h"
 
 /**
- * ƒŒƒeƒBƒNƒ‹‚ÌƒEƒBƒWƒFƒbƒgƒNƒ‰ƒX
+ * ãƒ¬ãƒ†ã‚£ã‚¯ãƒ«ã®ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆã‚¯ãƒ©ã‚¹
  */
 UCLASS()
 class MSGO_API UReticleWidget : public UUserWidget

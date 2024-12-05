@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/HPGaugeWidget.h"
@@ -27,7 +27,7 @@ bool UHPGaugeWidget::Initialize()
     return true;
 }
 
-// Å‘åHP‚ÌƒeƒLƒXƒg‚ğƒZƒbƒg
+// æœ€å¤§HPã®ãƒ†ã‚­ã‚¹ãƒˆã‚’ã‚»ãƒƒãƒˆ
 void UHPGaugeWidget::SetMaxHPText(const int32 InMaxHP)
 {
     if (!MaxHPText)
@@ -40,7 +40,7 @@ void UHPGaugeWidget::SetMaxHPText(const int32 InMaxHP)
     MaxHPText->SetText(text);    
 }
 
-// Œ»İ‚ÌHP‚ÌƒeƒLƒXƒg‚ÌƒZƒbƒg
+// ç¾åœ¨ã®HPã®ãƒ†ã‚­ã‚¹ãƒˆã®ã‚»ãƒƒãƒˆ
 void UHPGaugeWidget::SetNowHPText(const int32 InNowHP)
 {
     if (!NowHPText)
@@ -53,7 +53,7 @@ void UHPGaugeWidget::SetNowHPText(const int32 InNowHP)
     NowHPText->SetText(text);
 }
 
-// ƒZƒbƒgƒAƒbƒv
+// ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
 void UHPGaugeWidget::Setup(const int32 InMaxHP)
 {
     SetMaxHPText(InMaxHP);
@@ -63,7 +63,7 @@ void UHPGaugeWidget::Setup(const int32 InMaxHP)
     UpdateHPGauge(MaxHP);
 }
 
-// Œ»İ‚ÌHP‚ÌƒZƒbƒg
+// ç¾åœ¨ã®HPã®ã‚»ãƒƒãƒˆ
 void UHPGaugeWidget::SetNowHP(const int32 InNowHP)
 {
     SetNowHPText(InNowHP);
@@ -77,7 +77,7 @@ void UHPGaugeWidget::SetNowHP(const int32 InNowHP)
     //UpdateHPGauge();
 }
 
-// HPƒQ[ƒW‚ÌXV
+// HPã‚²ãƒ¼ã‚¸ã®æ›´æ–°
 void UHPGaugeWidget::UpdateHPGauge(int32 InNowHP)
 {
     if (!HPGauge)

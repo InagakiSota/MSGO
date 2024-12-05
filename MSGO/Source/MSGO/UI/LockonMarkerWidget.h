@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include "LockonMarkerWidget.generated.h"
 
 /**
- * ƒƒbƒNƒIƒ“ƒ}[ƒJ[‚ÌƒEƒBƒWƒFƒbƒgƒNƒ‰ƒX
+ * ãƒ­ãƒƒã‚¯ã‚ªãƒ³ãƒãƒ¼ã‚«ãƒ¼ã®ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆã‚¯ãƒ©ã‚¹
  */
 UCLASS()
 class MSGO_API ULockonMarkerWidget : public UUserWidget

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -10,7 +10,7 @@ class UTextBlock;
 class UProgressBar;
 
 /**
- * ƒu[ƒXƒgƒQ[ƒW‚ÌƒEƒBƒWƒFƒbƒgƒNƒ‰ƒX
+ * ãƒ–ãƒ¼ã‚¹ãƒˆã‚²ãƒ¼ã‚¸ã®ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆã‚¯ãƒ©ã‚¹
  */
 UCLASS()
 class MSGO_API UBoostGaugeWidget : public UUserWidget
@@ -20,12 +20,12 @@ class MSGO_API UBoostGaugeWidget : public UUserWidget
 protected:
 
 public:
-	// ƒZƒbƒgƒAƒbƒv
-	// @param			InMaxBoost		Œ»İ‚Ìƒu[ƒXƒg—e—Ê
+	// ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+	// @param			InMaxBoost		ç¾åœ¨ã®ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡
 	UFUNCTION(BlueprintCallable)
 	void Setup(const int32 InMaxBoost);
 
-	// Œ»İ‚Ìƒu[ƒXƒg—e—Ê‚ÌƒZƒbƒg
+	// ç¾åœ¨ã®ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡ã®ã‚»ãƒƒãƒˆ
 	UFUNCTION(BlueprintCallable)
 	void SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat);
 
@@ -35,26 +35,26 @@ protected:
 
 	bool Initialize() override;
 
-	// ƒu[ƒXƒgƒQ[ƒW‚ÌXV
+	// ãƒ–ãƒ¼ã‚¹ãƒˆã‚²ãƒ¼ã‚¸ã®æ›´æ–°
 	void UpdateBoostGauge(const bool bIsOverHeat);
 
 protected:
-	//// Å‘åHP‚ÌƒeƒLƒXƒg
+	//// æœ€å¤§HPã®ãƒ†ã‚­ã‚¹ãƒˆ
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	//TObjectPtr<UTextBlock> MaxHPText;
 
-	//// Œ»İ‚ÌHP‚ÌƒeƒLƒXƒg
+	//// ç¾åœ¨ã®HPã®ãƒ†ã‚­ã‚¹ãƒˆ
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	//TObjectPtr<UTextBlock> NowHPText;
 
-	// ƒu[ƒXƒgƒQ[ƒW
+	// ãƒ–ãƒ¼ã‚¹ãƒˆã‚²ãƒ¼ã‚¸
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UProgressBar> BoostGauge;
 
-	// Å‘åƒu[ƒXƒg—e—Ê
+	// æœ€å¤§ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡
 	int32 MaxBoostCap;
 
-	// Œ»İƒu[ƒXƒg—e—Ê
+	// ç¾åœ¨ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡
 	int32 NowBoostCap;
 	
 };

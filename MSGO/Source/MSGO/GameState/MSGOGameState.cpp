@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GameState/MSGOGameState.h"
@@ -6,6 +6,7 @@
 #include "UI/MSGOUIManager.h"
 #include "Characters/MSGOCharacter.h"
 #include "Collision/AttackCollisionPool.h"
+
 
 void AMSGOGameState::BeginPlay()
 {
@@ -42,8 +43,20 @@ void AMSGOGameState::BeginDestroy()
     }
 }
 
+// 自身の取得処理
 AMSGOGameState* AMSGOGameState::Get(const UObject* WorldContextObject)
 {
     UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     return World ? Cast<AMSGOGameState>(World->GetGameState()) : nullptr;
+}
+
+// 攻撃コリジョンプールから攻撃コリジョンを取得
+AAttackCollision* AMSGOGameState::GetAttackCollisionFromPool()
+{
+    if (!AttackCollisionPool)
+    {
+        return nullptr;
+    }
+
+    return AttackCollisionPool->GetAttackCollision();
 }

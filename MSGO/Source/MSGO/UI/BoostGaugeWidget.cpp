@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "UI/BoostGaugeWidget.h"
@@ -23,8 +23,8 @@ bool UBoostGaugeWidget::Initialize()
     return true;
 }
 
-// ƒZƒbƒgƒAƒbƒv
-// @param			InMaxBoost		Œ»Ý‚Ìƒu[ƒXƒg—e—Ê
+// ã‚»ãƒƒãƒˆã‚¢ãƒƒãƒ—
+// @param			InMaxBoost		ç¾åœ¨ã®ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡
 void UBoostGaugeWidget::Setup(const int32 InMaxBoost)
 {
     MaxBoostCap = NowBoostCap = InMaxBoost;
@@ -36,7 +36,7 @@ void UBoostGaugeWidget::Setup(const int32 InMaxBoost)
     BoostGauge->SetPercent(1.f);
 }
 
-// Œ»Ý‚Ìƒu[ƒXƒg—e—Ê‚ÌƒZƒbƒg
+// ç¾åœ¨ã®ãƒ–ãƒ¼ã‚¹ãƒˆå®¹é‡ã®ã‚»ãƒƒãƒˆ
 void UBoostGaugeWidget::SetNowBoost(const int32 InNowBoost, const bool bIsOverHeat)
 {
     NowBoostCap = InNowBoost;
@@ -44,7 +44,7 @@ void UBoostGaugeWidget::SetNowBoost(const int32 InNowBoost, const bool bIsOverHe
     UpdateBoostGauge(bIsOverHeat);
 }
 
-// ƒu[ƒXƒgƒQ[ƒW‚ÌXV
+// ãƒ–ãƒ¼ã‚¹ãƒˆã‚²ãƒ¼ã‚¸ã®æ›´æ–°
 void UBoostGaugeWidget::UpdateBoostGauge(const bool bIsOverHeat)
 {
     if (!BoostGauge)
@@ -55,7 +55,7 @@ void UBoostGaugeWidget::UpdateBoostGauge(const bool bIsOverHeat)
     float percent = (float)NowBoostCap / (float)MaxBoostCap;
     BoostGauge->SetPercent(percent);
 
-    // ƒQ[ƒW‚ÌF‚ðƒZƒbƒg
+    // ã‚²ãƒ¼ã‚¸ã®è‰²ã‚’ã‚»ãƒƒãƒˆ
     if (percent > 0.15f && !bIsOverHeat)
     {
         BoostGauge->SetFillColorAndOpacity(FLinearColor::Yellow);

@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -10,12 +10,12 @@ public class MSGO : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "HeadMountedDisplay", "GameplayAbilities", "GameplayTags", "GameplayTasks"/*, "MSGO_API"*/ });
 		
-		// ƒGƒfƒBƒ^ê—p‚ÉUnrealEdƒ‚ƒWƒ…[ƒ‹‚ğ’Ç‰Á
+		// ã‚¨ãƒ‡ã‚£ã‚¿å°‚ç”¨ã«UnrealEdãƒ¢ã‚¸ãƒ¥ãƒ¼ãƒ«ã‚’è¿½åŠ 
 		if (Target.bBuildEditor)
 		{
 			PrivateDependencyModuleNames.AddRange(new string[] { "UnrealEd" });
 		}
-		// ƒpƒX‚ÉƒvƒƒWƒFƒNƒg–¼‚ğ’Ç‰Á
+		// ãƒ‘ã‚¹ã«ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ãƒˆåã‚’è¿½åŠ 
 		string ProjectName = Target.ProjectFile.GetFileNameWithoutExtension();
 		PublicIncludePaths.Add(ProjectName);
 	}

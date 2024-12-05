@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Collision/AttackCollisionPool.h"
@@ -11,9 +11,21 @@ void UAttackCollisionPool::BeginPlay()
     AttackCollisions.Empty();
 
     TObjectPtr<AAttackCollision> atkColl;
+    UWorld* world = this->GetWorld();
+    if (!world)
+    {
+        return;
+    }
+
     for (int32 idx = 0; idx < AttackCollisionPoolNum; idx++)
     {
-        atkColl = NewObject<AAttackCollision>();
+        atkColl = world->SpawnActor<AAttackCollision>(AAttackCollision::StaticClass());
+        if (!atkColl || !IsValid(atkColl))
+        {
+            continue;
+        }
+
+        atkColl->SleepObject();
         AttackCollisions.Add(atkColl);
     }
 }
@@ -45,33 +57,44 @@ void UAttackCollisionPool::BeginDestroy()
     AttackCollisions.Empty();
 }
 
-// UŒ‚ƒRƒŠƒWƒ‡ƒ“‚ğæ“¾
+// æ”»æ’ƒã‚³ãƒªã‚¸ãƒ§ãƒ³ã‚’å–å¾—
 AAttackCollision* UAttackCollisionPool::GetAttackCollision() const
 {
     for (int32 idx = 0; idx < AttackCollisionPoolNum; idx++)
     {
-        // –³Œø‚È—v‘f”‚È‚çƒXƒ‹[
+        // ç„¡åŠ¹ãªè¦ç´ æ•°ãªã‚‰ã‚¹ãƒ«ãƒ¼
         if (!AttackCollisions.IsValidIndex(idx))
         {
             continue;
         }
 
-        // Null‚È‚çƒXƒ‹[
+        // Nullãªã‚‰ã‚¹ãƒ«ãƒ¼
         if (AttackCollisions[idx] == nullptr || !IsValid(AttackCollisions[idx]))
         {
             continue;
         }
 
-        // g—p’†‚È‚çƒXƒ‹[
+        // ä½¿ç”¨ä¸­ãªã‚‰ã‚¹ãƒ«ãƒ¼
         if (AttackCollisions[idx]->IsActive())
         {
             continue;
         }
 
-        // ‚±‚±‚Ü‚Å—ˆ‚½‚ç•Ô‚·
+        // ã“ã“ã¾ã§æ¥ãŸã‚‰è¿”ã™
         return AttackCollisions[idx];
     }
 
     return nullptr;
+}
+
+UWorld* UAttackCollisionPool::GetWorld() const
+{
+    UWorld* world = (GetOuter() != nullptr) ? GetOuter()->GetWorld() : GWorld;
+    if (world == nullptr)
+    {
+        world = GWorld;
+    }
+
+    return world;
 }
 
