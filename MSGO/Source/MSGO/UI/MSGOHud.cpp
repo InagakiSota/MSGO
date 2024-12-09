@@ -22,7 +22,7 @@ void AMSGOHud::BeginPlay()
         UIRef = Cast<UMyHudWidget>(UWidgetBlueprintLibrary::Create(GetWorld(), widgetClass, playerController));
    
         // ViewPortに追加
-        UIRef->AddToViewport(0);
+        //UIRef->AddToViewport(0);
     }
 
     AMSGOGameState* gameState = Cast<AMSGOGameState>(UGameplayStatics::GetGameState(this));
