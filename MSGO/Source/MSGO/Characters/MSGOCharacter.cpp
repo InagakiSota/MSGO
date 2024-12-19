@@ -18,6 +18,9 @@
 #include "Collision/DamageCollision.h"
 #include "../GameState/MSGOGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/NetDriver.h"
+#include "Engine/Engine.h"
+#include "Net/UnrealNetwork.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
@@ -47,6 +50,7 @@ AMSGOCharacter::AMSGOCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->SetIsReplicated(true);
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -115,6 +119,8 @@ void AMSGOCharacter::BeginPlay()
 	{
 		AttackCollision->SleepObject();
 	}
+
+	MyRotate = GetActorRotation();
 	//APlayerCameraManager* cameraManager = UGameplayStati
 
 }
@@ -136,6 +142,16 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 
 	//UGameplayStatics::GetGame
 }
+
+void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// レプリケートする変数を追加
+	DOREPLIFETIME(AMSGOCharacter, MyRotate);
+
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -199,7 +215,6 @@ void AMSGOCharacter::InputMove(const FVector2D& Input)
 	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
 
 	AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
-
 }
 
 // ダッシュ　入力
@@ -464,11 +479,28 @@ void AMSGOCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
-
 }
 
+
 // カメラの向いている方に向く
-void AMSGOCharacter::RotToCamera(float InRotSpeed)
+//void AMSGOCharacter::RotToCamera(float InRotSpeed)
+//{
+//	// カメラの角度(Yawのみ)を取得
+//	FRotator cameraRot = FollowCamera->GetComponentRotation();
+//	cameraRot.Pitch = cameraRot.Roll = 0.0f;
+//
+//	// 自身の角度(Yawのみ)を取得
+//	FRotator nowRot = GetActorRotation();
+//	nowRot.Pitch = nowRot.Roll = 0.0f;
+//
+//	// カメラの向いている方向に回転
+//	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
+//	
+//	SetActorRotation(MyRotate);
+//}
+
+// カメラの向いている方に向く
+void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
 {
 	// カメラの角度(Yawのみ)を取得
 	FRotator cameraRot = FollowCamera->GetComponentRotation();
@@ -479,11 +511,15 @@ void AMSGOCharacter::RotToCamera(float InRotSpeed)
 	nowRot.Pitch = nowRot.Roll = 0.0f;
 
 	// カメラの向いている方向に回転
-	SetActorRotation(FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed));
-
+	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
 	
-	//AMSGOGameState::
+	SetActorRotation(MyRotate);
 }
+bool AMSGOCharacter::RotToCamera_Validate(float InRotSpeed)
+{
+	return true;
+}
+
 
 // 高度上限かのチェック
 // return		trueなら高度上限
@@ -496,4 +532,12 @@ bool AMSGOCharacter::IsHeightLimit()
 void AMSGOCharacter::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
 {
 	StatusComponent->AddDamage(InAttackPowerParam);
+}
+
+// キャラの向きの変数が更新された際に呼ばれる
+void AMSGOCharacter::OnRep_MyRotate()
+{
+	SetActorRotation(MyRotate);
+
+	//UKismetSystemLibrary::PrintString(this, HasAuthority() ? TEXT("true") : TEXT("false"));
 }

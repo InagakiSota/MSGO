@@ -62,13 +62,6 @@ public:
 	/** Follow camera */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
-public:
-	AMSGOCharacter();
-
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	virtual void Tick(float DeltaSeconds) override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
@@ -204,10 +197,25 @@ private:
 	// 上昇開始時の高度
 	float BeginRiseHeight;
 
+	// キャラの向き用の変数
+	UPROPERTY(ReplicatedUsing = OnRep_MyRotate)
+	FRotator MyRotate = FRotator::ZeroRotator;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AAttackCollision> AttackCollision;
 
+
+public:
+	AMSGOCharacter();
+
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	// 移動処理
@@ -253,6 +261,10 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	// キャラの向きの変数が更新された際に呼ばれる
+	UFUNCTION()
+	void OnRep_MyRotate();
+
 public:
 	// キャラクターステータスコンポーネントの取得
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -268,7 +280,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	// カメラの向いている方に向く
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation)
 	void RotToCamera(float InRotSpeed);
 
 	// 移動タイプの取得
