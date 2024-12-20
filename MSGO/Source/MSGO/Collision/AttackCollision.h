@@ -32,12 +32,12 @@ public:
 	// @param		InAttackCollArg		攻撃コリジョンの設定の構造体
 	// @param		InStartPos			攻撃コリジョンの初期位置
 	// @return							起動出来たらtrueを返す
-	UFUNCTION(BlueprintCallable)
-	bool WakeObject(const FAttackParameter& InAttackParam, const FMachineTeamID& InOwnerTeamID);
+	UFUNCTION(BlueprintCallable, Reliable, NetMulticast, WithValidation)
+	void WakeObject(const FAttackParameter& InAttackParam, const FMachineTeamID& InOwnerTeamID);
 
 	// オブジェクトの停止
-	UFUNCTION(BlueprintCallable)
-	bool SleepObject();
+	UFUNCTION(BlueprintCallable, Reliable, NetMulticast, WithValidation)
+	void SleepObject();
 
 	// 使用中フラグの取得
 	bool GetIsUsing() { return bIsUsing; }

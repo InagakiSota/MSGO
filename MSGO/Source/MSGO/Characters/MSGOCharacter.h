@@ -297,5 +297,11 @@ public:
 	// 被弾処理
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
+	UFUNCTION(Reliable, Server, WithValidation)
+	void OnAttack();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void WakeAttackObject();
+
 };
 

@@ -165,7 +165,7 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Completed, this, &AMSGOCharacter::EndMove);
 
 		// 攻撃
-		//enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::);
+		enhancedInput->BindAction(IA_Attack, ETriggerEvent::Started, this, &AMSGOCharacter::OnAttack);
 
 		// 視点操作
 		enhancedInput->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AMSGOCharacter::Look);
@@ -540,4 +540,14 @@ void AMSGOCharacter::OnRep_MyRotate()
 	SetActorRotation(MyRotate);
 
 	//UKismetSystemLibrary::PrintString(this, HasAuthority() ? TEXT("true") : TEXT("false"));
+}
+
+void AMSGOCharacter::OnAttack_Implementation()
+{
+	WakeAttackObject();
+}
+
+bool AMSGOCharacter::OnAttack_Validate()
+{
+	return true;
 }
