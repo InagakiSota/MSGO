@@ -72,49 +72,6 @@ void AAttackCollision::Tick(float DeltaTime)
 	MoveTotalSeconds += DeltaTime;
 }
 
-//bool AAttackCollision::WakeObject(const FAttackParameter& InAttackParam, const FMachineTeamID& InOwnerTeamID)
-//{
-//	if (BoxCollision == nullptr)
-//	{
-//		return false;
-//	}
-//
-//	// 攻撃パラメータ取得
-//	AttackParam = InAttackParam;
-//
-//
-//	// 移動パラメータから初期座標、初期角度をセット
-//	SetActorLocation(AttackParam.MovementParam.StartPos);
-//	SetActorRotation(AttackParam.MovementParam.StartRot);
-//
-//	AttackParam.MovementParam.MoveDir.Normalize();
-//
-//#if WITH_EDITOR
-//	// テスト描画
-//	BoxCollision->bHiddenInGame = false;
-//	BoxCollision->SetVisibility(true);
-//
-//	StaticMesh->SetVisibility(true);
-//
-//#endif
-//	//OwnerCharacterPtr = InOwner;
-//
-//	OwnerTeamID = InOwnerTeamID;
-//
-//	SetActorTickEnabled(true);
-//
-//	MoveTotalSeconds = 0.0f;
-//
-//	bIsUsing = true;
-//
-//	// コリジョンパラメータからサイズのセットアップ
-//	BoxCollision->SetBoxExtent(AttackParam.CollisionParam.CollisionSize);
-//	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-//	BoxCollision->SetComponentTickEnabled(true);
-//
-//	return true;
-//}
-
 // オブジェクトの起動
 // @param		InAttackCollArg		攻撃コリジョンの設定の構造体
 // @param		InStartPos			攻撃コリジョンの初期位置
@@ -166,33 +123,6 @@ bool AAttackCollision::WakeObject_Validate(const FAttackParameter& InAttackParam
 {
 	return true;
 }
-
-//bool AAttackCollision::SleepObject()
-//{
-//	// コリジョンの無効化
-//	BoxCollision->SetBoxExtent(FVector(0.f));
-//	BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-//	BoxCollision->SetComponentTickEnabled(false);
-//
-//#if WITH_EDITOR
-//	// テスト描画 非表示に
-//	BoxCollision->bHiddenInGame = true;
-//	BoxCollision->SetVisibility(false);
-//
-//	StaticMesh->SetVisibility(false);
-//
-//#endif
-//	// Tickを止める
-//	this->SetActorTickEnabled(false);
-//
-//	// 未使用にする
-//	bIsUsing = false;
-//
-//	// タイマーリセット
-//	MoveTotalSeconds = 0.0f;
-//
-//	return true;
-//}
 
 // オブジェクトの停止
 void AAttackCollision::SleepObject_Implementation()

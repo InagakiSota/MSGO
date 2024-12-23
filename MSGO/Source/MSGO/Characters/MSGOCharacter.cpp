@@ -79,6 +79,9 @@ AMSGOCharacter::AMSGOCharacter()
 
 	FActorSpawnParameters spawnParam;
 	spawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
 	
@@ -148,7 +151,7 @@ void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// レプリケートする変数を追加
-	DOREPLIFETIME(AMSGOCharacter, MyRotate);
+	DOREPLIFETIME(AMSGOCharacter, MoveType);
 
 }
 
@@ -165,7 +168,7 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Completed, this, &AMSGOCharacter::EndMove);
 
 		// 攻撃
-		enhancedInput->BindAction(IA_Attack, ETriggerEvent::Started, this, &AMSGOCharacter::OnAttack);
+		enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::OnAttack);
 
 		// 視点操作
 		enhancedInput->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AMSGOCharacter::Look);
@@ -190,7 +193,7 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 
 	if ((Controller != nullptr) && (MoveInput.Length() > 0.0f))
 	{	
-		InputMove(MoveInput);
+		InputMoveAndRotation(MoveInput);
 	}
 }
 
@@ -205,7 +208,7 @@ void AMSGOCharacter::EndMove()
 	}
 }
 
-void AMSGOCharacter::InputMove(const FVector2D& Input)
+void AMSGOCharacter::InputMoveAndRotation_Implementation(const FVector2D& Input)
 {
 	FVector2D inputTemp = Input;
 
@@ -214,7 +217,7 @@ void AMSGOCharacter::InputMove(const FVector2D& Input)
 	inputTemp.Normalize();
 	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
 
-	AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
+	MovementToInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
 }
 
 // ダッシュ　入力
@@ -270,7 +273,7 @@ void AMSGOCharacter::UpdateDash()
 	// ニュートラル時の移動処理
 	if (MoveInput.Length() <= 0.0f)
 	{
-		InputMove(FVector2D(1.0f, 0.0f));
+		InputMoveAndRotation(FVector2D(1.0f, 0.0f));
 	}
 
 	BoostMoveTimer += this->GetWorld()->DeltaTimeSeconds;
@@ -483,23 +486,6 @@ void AMSGOCharacter::Look(const FInputActionValue& Value)
 
 
 // カメラの向いている方に向く
-//void AMSGOCharacter::RotToCamera(float InRotSpeed)
-//{
-//	// カメラの角度(Yawのみ)を取得
-//	FRotator cameraRot = FollowCamera->GetComponentRotation();
-//	cameraRot.Pitch = cameraRot.Roll = 0.0f;
-//
-//	// 自身の角度(Yawのみ)を取得
-//	FRotator nowRot = GetActorRotation();
-//	nowRot.Pitch = nowRot.Roll = 0.0f;
-//
-//	// カメラの向いている方向に回転
-//	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
-//	
-//	SetActorRotation(MyRotate);
-//}
-
-// カメラの向いている方に向く
 void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
 {
 	// カメラの角度(Yawのみ)を取得
@@ -515,11 +501,12 @@ void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
 	
 	SetActorRotation(MyRotate);
 }
-bool AMSGOCharacter::RotToCamera_Validate(float InRotSpeed)
-{
-	return true;
-}
 
+// 入力した方向に移動
+void AMSGOCharacter::MovementToInput_Implementation(FVector InInputDir, float InScaleValue)
+{
+	this->AddMovementInput(InInputDir, InScaleValue);
+}
 
 // 高度上限かのチェック
 // return		trueなら高度上限
@@ -528,18 +515,11 @@ bool AMSGOCharacter::IsHeightLimit()
 	return GetActorLocation().Z - BeginRiseHeight >= StatusComponent->GetStatusParameter().JumpRiseHeight;
 }
 
+
 // 被弾処理
 void AMSGOCharacter::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
 {
 	StatusComponent->AddDamage(InAttackPowerParam);
-}
-
-// キャラの向きの変数が更新された際に呼ばれる
-void AMSGOCharacter::OnRep_MyRotate()
-{
-	SetActorRotation(MyRotate);
-
-	//UKismetSystemLibrary::PrintString(this, HasAuthority() ? TEXT("true") : TEXT("false"));
 }
 
 void AMSGOCharacter::OnAttack_Implementation()
@@ -547,7 +527,3 @@ void AMSGOCharacter::OnAttack_Implementation()
 	WakeAttackObject();
 }
 
-bool AMSGOCharacter::OnAttack_Validate()
-{
-	return true;
-}

@@ -155,7 +155,7 @@ protected:
 	FVector2D MoveInput;
 
 	// 移動タイプ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_MoveType, Category = "Action")
 	EMOVE_TYPE MoveType;
 
 	// Yawの回転速度
@@ -198,7 +198,7 @@ private:
 	float BeginRiseHeight;
 
 	// キャラの向き用の変数
-	UPROPERTY(ReplicatedUsing = OnRep_MyRotate)
+	//UPROPERTY(ReplicatedUsing = OnRep_MyRotate)
 	FRotator MyRotate = FRotator::ZeroRotator;
 
 public:
@@ -218,13 +218,19 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+
+/////////////////////////////////////////////////////
+// 入力回り
+/////////////////////////////////////////////////////
+
 	// 移動処理
 	void Move(const FInputActionValue& Value);
 
 	// 移動終了
 	void EndMove();
 
-	void InputMove(const FVector2D& Input);
+	UFUNCTION(Reliable, Server)
+	void InputMoveAndRotation(const FVector2D& Input);
 
 	// 視点操作
 	void Look(const FInputActionValue& Value);
@@ -261,9 +267,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
-	// キャラの向きの変数が更新された際に呼ばれる
 	UFUNCTION()
-	void OnRep_MyRotate();
+	void OnRep_MoveType() {};
 
 public:
 	// キャラクターステータスコンポーネントの取得
@@ -274,14 +279,21 @@ public:
 	}
 
 public:
+/////////////////////////////////////////////////////
+// 移動系
+/////////////////////////////////////////////////////
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	// カメラの向いている方に向く
-	UFUNCTION(BlueprintCallable, Reliable, Server, WithValidation)
+	UFUNCTION(BlueprintCallable, Reliable, NetMulticast)
 	void RotToCamera(float InRotSpeed);
+
+	UFUNCTION(Reliable, NetMulticast)
+	void MovementToInput(FVector InInputDir, float InScaleValue);
 
 	// 移動タイプの取得
 	EMOVE_TYPE GetNowMoveType()
@@ -294,11 +306,16 @@ public:
 		return NowJumpStatus;
 	}
 
+
+/////////////////////////////////////////////////////
+// 攻撃系
+/////////////////////////////////////////////////////
 	// 被弾処理
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
-	UFUNCTION(Reliable, Server, WithValidation)
+	UFUNCTION(Reliable, Server)
 	void OnAttack();
+
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void WakeAttackObject();
