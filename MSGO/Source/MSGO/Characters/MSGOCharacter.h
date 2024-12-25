@@ -151,7 +151,7 @@ protected:
 	TObjectPtr<UDamageCollision> DamageCollision;
 
 	// 移動入力値
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MoveInput, Category = "Action")
 	FVector2D MoveInput;
 
 	// 移動タイプ
@@ -236,23 +236,37 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	// ダッシュ　入力
+	UFUNCTION(Reliable, Server)
 	void OnPressDash();
 	// ダッシュ　リリース
+	UFUNCTION(Reliable, Server)
 	void OnReleaseDash();
 	// ダッシュ　入力中
+	UFUNCTION(Reliable, Server)
 	void UpdateDash();
 
+	// ダッシュ開始
+	UFUNCTION(Reliable, NetMulticast)
+	void BeginDash();
+	// ダッシュ中
+	UFUNCTION(Reliable, NetMulticast)
+	void OnGoingDash();
 	// ダッシュ終了処理
+	UFUNCTION(Reliable, NetMulticast)
 	void EndDash();
 
 	// ジャンプ　入力
+	UFUNCTION(Reliable, Server)
 	void OnPressJump();
 	// ジャンプ　リリース
+	UFUNCTION(Reliable, Server)
 	void OnReleaseJump();
 	// ジャンプ　入力中
+	UFUNCTION(Reliable, Server)
 	void UpdateJump();
 
 	// ジャンプ終了処理
+	UFUNCTION(Reliable, Server)
 	void EndJump();
 
 	// オーバーヒート時の処理
@@ -266,6 +280,9 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
+
+	UFUNCTION()
+	void OnRep_MoveInput() {};
 
 	UFUNCTION()
 	void OnRep_MoveType() {};

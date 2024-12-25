@@ -144,6 +144,8 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 	//}
 
 	//UGameplayStatics::GetGame
+
+
 }
 
 void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -152,6 +154,7 @@ void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	// レプリケートする変数を追加
 	DOREPLIFETIME(AMSGOCharacter, MoveType);
+	DOREPLIFETIME(AMSGOCharacter, MoveInput);
 
 }
 
@@ -195,6 +198,28 @@ void AMSGOCharacter::Move(const FInputActionValue& Value)
 	{	
 		InputMoveAndRotation(MoveInput);
 	}
+
+}
+void AMSGOCharacter::InputMoveAndRotation_Implementation(const FVector2D& Input)
+{
+	FVector2D inputTemp = Input;
+
+	RotToCamera(YawRotSpeed);
+
+	inputTemp.Normalize();
+	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
+
+	MovementToInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
+
+	UKismetSystemLibrary::PrintString(this, inputTemp.ToString());
+
+}
+
+
+// 入力した方向に移動
+void AMSGOCharacter::MovementToInput_Implementation(FVector InInputDir, float InScaleValue)
+{
+	this->AddMovementInput(InInputDir, InScaleValue);
 }
 
 // 移動終了
@@ -208,20 +233,52 @@ void AMSGOCharacter::EndMove()
 	}
 }
 
-void AMSGOCharacter::InputMoveAndRotation_Implementation(const FVector2D& Input)
+// 視点操作
+void AMSGOCharacter::Look(const FInputActionValue& Value)
 {
-	FVector2D inputTemp = Input;
+	FVector2D LookInput = Value.Get<FVector2D>();
 
-	RotToCamera(YawRotSpeed);
+	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+}
 
-	inputTemp.Normalize();
-	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
+// カメラの向いている方に向く
+void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
+{
+	// カメラの角度(Yawのみ)を取得
+	FRotator cameraRot = FollowCamera->GetComponentRotation();
+	cameraRot.Pitch = cameraRot.Roll = 0.0f;
 
-	MovementToInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
+	// 自身の角度(Yawのみ)を取得
+	FRotator nowRot = GetActorRotation();
+	nowRot.Pitch = nowRot.Roll = 0.0f;
+
+	// カメラの向いている方向に回転
+	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
+
+	SetActorRotation(MyRotate);
 }
 
 // ダッシュ　入力
-void AMSGOCharacter::OnPressDash()
+void AMSGOCharacter::OnPressDash_Implementation()
+{
+	BeginDash();
+}
+
+// ダッシュ　リリース
+void AMSGOCharacter::OnReleaseDash_Implementation()
+{
+	EndDash();
+}
+
+// ダッシュ 入力中
+void AMSGOCharacter::UpdateDash_Implementation()
+{
+	OnGoingDash();
+}
+
+// ダッシュ開始処理
+void AMSGOCharacter::BeginDash_Implementation()
 {
 	// オーバーヒート中は処理しない
 	if (StatusComponent->GetIsOverHeat())
@@ -247,29 +304,17 @@ void AMSGOCharacter::OnPressDash()
 	// 最高速度に移行するまでの秒数を算出
 	TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_MaxSpeed);
 
-
 }
 
-// ダッシュ　リリース
-void AMSGOCharacter::OnReleaseDash()
-{
-	if (StatusComponent->GetIsOverHeat())
-	{
-		return;
-	}
-
-	EndDash();
-}
-
-// ダッシュ 入力中
-void AMSGOCharacter::UpdateDash()
+// ダッシュ中処理
+void AMSGOCharacter::OnGoingDash_Implementation()
 {
 	// オーバーヒート中は処理しない
 	if (StatusComponent->GetIsOverHeat() || MoveType != EMOVE_TYPE::Dash)
 	{
 		return;
 	}
-	
+
 	// ニュートラル時の移動処理
 	if (MoveInput.Length() <= 0.0f)
 	{
@@ -283,10 +328,10 @@ void AMSGOCharacter::UpdateDash()
 
 	switch (NowBoostSpeedStatus)
 	{
-	// 初速
+		// 初速
 	case EBOOST_SPEED_STATUS::InitSpeed:
 		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().InitSpeed, StatusComponent->GetStatusParameter().MaxSpeed, targetSecondsRate, EEasingFunc::EaseIn);
-		
+
 		if (targetSecondsRate >= 1.0f)
 		{
 			BoostMoveTimer = 0.0f;
@@ -296,7 +341,7 @@ void AMSGOCharacter::UpdateDash()
 			NowBoostSpeedStatus = EBOOST_SPEED_STATUS::MaxSpeed;
 		}
 		break;
-	// 最高速度
+		// 最高速度
 	case EBOOST_SPEED_STATUS::MaxSpeed:
 		moveSpeed = StatusComponent->GetStatusParameter().MaxSpeed;
 
@@ -320,6 +365,7 @@ void AMSGOCharacter::UpdateDash()
 
 		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate, EEasingFunc::EaseOut);
 
+
 		break;
 	default:
 		break;
@@ -328,11 +374,17 @@ void AMSGOCharacter::UpdateDash()
 
 	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
 	GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxFlySpeed = moveSpeed;
+
 }
 
 // ダッシュ終了処理
-void AMSGOCharacter::EndDash()
+void AMSGOCharacter::EndDash_Implementation()
 {
+	if (StatusComponent->GetIsOverHeat())
+	{
+		return;
+	}
+
 	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
 	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
 	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
@@ -360,7 +412,7 @@ void AMSGOCharacter::EndDash()
 
 
 // ジャンプ　入力
-void AMSGOCharacter::OnPressJump()
+void AMSGOCharacter::OnPressJump_Implementation()
 {
 	// オバヒ中ならただのジャンプ
 	if (MoveType == EMOVE_TYPE::Walk && StatusComponent->GetIsOverHeat())
@@ -393,7 +445,7 @@ void AMSGOCharacter::OnPressJump()
 
 }
 // ジャンプ　リリース
-void AMSGOCharacter::OnReleaseJump()
+void AMSGOCharacter::OnReleaseJump_Implementation()
 {
 	if (MoveType == EMOVE_TYPE::Dash)
 	{
@@ -405,7 +457,7 @@ void AMSGOCharacter::OnReleaseJump()
 	EndJump();
 }
 // ジャンプ　入力中
-void AMSGOCharacter::UpdateJump()
+void AMSGOCharacter::UpdateJump_Implementation()
 {
 	// オバヒ中なら処理しない
 	if (StatusComponent->GetIsOverHeat())
@@ -449,7 +501,7 @@ void AMSGOCharacter::UpdateJump()
 }
 
 // ジャンプ終了処理
-void AMSGOCharacter::EndJump()
+void AMSGOCharacter::EndJump_Implementation()
 {
 	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
@@ -475,38 +527,6 @@ void AMSGOCharacter::OnOverHeat()
 
 
 
-// 視点操作
-void AMSGOCharacter::Look(const FInputActionValue& Value)
-{
-	FVector2D LookInput = Value.Get<FVector2D>();
-
-	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
-	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
-}
-
-
-// カメラの向いている方に向く
-void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
-{
-	// カメラの角度(Yawのみ)を取得
-	FRotator cameraRot = FollowCamera->GetComponentRotation();
-	cameraRot.Pitch = cameraRot.Roll = 0.0f;
-
-	// 自身の角度(Yawのみ)を取得
-	FRotator nowRot = GetActorRotation();
-	nowRot.Pitch = nowRot.Roll = 0.0f;
-
-	// カメラの向いている方向に回転
-	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
-	
-	SetActorRotation(MyRotate);
-}
-
-// 入力した方向に移動
-void AMSGOCharacter::MovementToInput_Implementation(FVector InInputDir, float InScaleValue)
-{
-	this->AddMovementInput(InInputDir, InScaleValue);
-}
 
 // 高度上限かのチェック
 // return		trueなら高度上限
