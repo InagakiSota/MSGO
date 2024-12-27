@@ -151,7 +151,7 @@ protected:
 	TObjectPtr<UDamageCollision> DamageCollision;
 
 	// 移動入力値
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MoveInput, Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MoveInput, /*Replicated,*/ Category = "Action")
 	FVector2D MoveInput;
 
 	// 移動タイプ
@@ -224,7 +224,13 @@ protected:
 /////////////////////////////////////////////////////
 
 	// 移動処理
-	void Move(const FInputActionValue& Value);
+	//UFUNCTION(Reliable, Server)
+	void OnMove(const FInputActionValue& Value);
+
+	UFUNCTION(Reliable, Server)
+	void Server_SetMoveInput(const FVector2D& InValue);
+	UFUNCTION(Reliable, NetMulticast)
+	void SetMoveInput(const FVector2D& InValue);
 
 	// 移動終了
 	void EndMove();
@@ -248,12 +254,12 @@ protected:
 	// ダッシュ開始
 	UFUNCTION(Reliable, NetMulticast)
 	void BeginDash();
-	// ダッシュ中
-	UFUNCTION(Reliable, NetMulticast)
-	void OnGoingDash();
 	// ダッシュ終了処理
 	UFUNCTION(Reliable, NetMulticast)
 	void EndDash();
+	// ダッシュ中
+	UFUNCTION(Reliable, NetMulticast)
+	void OnGoingDash();
 
 	// ジャンプ　入力
 	UFUNCTION(Reliable, Server)
@@ -282,7 +288,7 @@ protected:
 	// End of APawn interface
 
 	UFUNCTION()
-	void OnRep_MoveInput() {};
+	void OnRep_MoveInput();
 
 	UFUNCTION()
 	void OnRep_MoveType() {};
@@ -322,6 +328,12 @@ public:
 	{
 		return NowJumpStatus;
 	}
+	
+	// 最高速度を変更する
+	UFUNCTION(Reliable, Server)
+	void Server_ChangeMaxMoveSpeed(const float& InSpeed);
+	UFUNCTION(Reliable, NetMulticast)
+	void ChangeMaxMoveSpeed(const float& InSpeed);
 
 
 /////////////////////////////////////////////////////
