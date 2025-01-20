@@ -21,13 +21,16 @@
 #include "Engine/NetDriver.h"
 #include "Engine/Engine.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/MSGOCharacterMovementComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AMSGOCharacter
 
 
-AMSGOCharacter::AMSGOCharacter()
+AMSGOCharacter::AMSGOCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMSGOCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+
 	// ステータスコンポーネントをアタッチ
 	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
 
@@ -47,12 +50,15 @@ AMSGOCharacter::AMSGOCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->SetIsReplicated(true);
-
-	GetCharacterMovement()->SetIsReplicated(true);
+	MSGOCharacterMovement = GetCastedCharacterMovement();
+	if (MSGOCharacterMovement)
+	{
+		// Configure character movement
+		MSGOCharacterMovement->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+		MSGOCharacterMovement->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+		MSGOCharacterMovement->SetIsReplicated(true);
+		MSGOCharacterMovement->bUseControllerDesiredRotation = true;
+	}
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -70,7 +76,7 @@ AMSGOCharacter::AMSGOCharacter()
 	YawRotSpeed = 10.f;
 	DashRiseSpeed = 1.f;
 
-	PrevMoveInput = TempMoveInput = FVector2D(0.0f,0.0f);
+	PrevMoveInput = TempMoveInput = FVector2D(0.0f, 0.0f);
 
 	BoostMoveTimer = 0.0f;
 	TargetSeconds = 0.0f;
@@ -82,11 +88,8 @@ AMSGOCharacter::AMSGOCharacter()
 	FActorSpawnParameters spawnParam;
 	spawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	bReplicates = true;
-	SetReplicateMovement(true);
-	
 	//UKismetSystemLibrary::PrintString(this, FString::FromInt(StatusComponent->GetStatusParameter().MaxSpeed));
-	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -98,7 +101,7 @@ void AMSGOCharacter::BeginPlay()
 	//UKismetSystemLibrary::PrintString(this, "MSGOCharacter:BeginPlay");
 
 	StatusComponent->SetupParameter(MachineID);
-	
+
 	// オーバーヒート時の処理をバインド
 	StatusComponent->OnOverHeatDelegate.AddUObject(this, &AMSGOCharacter::OnOverHeat);
 
@@ -112,12 +115,12 @@ void AMSGOCharacter::BeginPlay()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = MaxAcceleration;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+	MSGOCharacterMovement->JumpZVelocity = 700.f;
+	MSGOCharacterMovement->AirControl = 0.35f;
+	MSGOCharacterMovement->MaxWalkSpeed = MaxWalkSpeed;
+	MSGOCharacterMovement->MaxAcceleration = MaxAcceleration;
+	MSGOCharacterMovement->MinAnalogWalkSpeed = 20.f;
+	MSGOCharacterMovement->BrakingDecelerationWalking = 2000.f;
 
 	AttackCollision = GetWorld()->SpawnActor<AAttackCollision>(AAttackCollision::StaticClass());
 	if (AttackCollision)
@@ -134,7 +137,7 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
+	if (MSGOCharacterMovement->MovementMode == EMovementMode::MOVE_Walking)
 	{
 		BeginRiseHeight = 0.f;
 		NowJumpStatus = EJUMP_STATUS::Idle;
@@ -146,8 +149,6 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 	//}
 
 	//UGameplayStatics::GetGame
-
-
 }
 
 void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -155,8 +156,7 @@ void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// レプリケートする変数を追加
-	DOREPLIFETIME(AMSGOCharacter, MoveType);
-	DOREPLIFETIME(AMSGOCharacter, MoveInput);
+	DOREPLIFETIME(AMSGOCharacter, MyRotate);
 
 }
 
@@ -169,11 +169,11 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	if (UEnhancedInputComponent* enhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// 移動
-		enhancedInput->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMSGOCharacter::OnMove);
+		enhancedInput->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AMSGOCharacter::Move);
 		enhancedInput->BindAction(IA_Move, ETriggerEvent::Completed, this, &AMSGOCharacter::EndMove);
 
 		// 攻撃
-		enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::OnAttack);
+		//enhancedInput->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AMSGOCharacter::);
 
 		// 視点操作
 		enhancedInput->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AMSGOCharacter::Look);
@@ -192,45 +192,14 @@ void AMSGOCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 }
 
 // 移動処理
-void AMSGOCharacter::OnMove/*_Implementation*/(const FInputActionValue& Value)
+void AMSGOCharacter::Move(const FInputActionValue& Value)
 {
-	Server_SetMoveInput(Value.Get<FVector2D>());
+	MoveInput = Value.Get<FVector2D>();
 
-	if (MoveInput.Length() > 0.0f)
+	if ((Controller != nullptr) && (MoveInput.Length() > 0.0f))
 	{
-		InputMoveAndRotation(MoveInput);
+		InputMove(MoveInput);
 	}
-}
-
-void AMSGOCharacter::Server_SetMoveInput_Implementation(const FVector2D& InValue)
-{
-	SetMoveInput(InValue);
-}
-void AMSGOCharacter::SetMoveInput_Implementation(const FVector2D& InValue)
-{
-	MoveInput = InValue;
-}
-
-
-void AMSGOCharacter::InputMoveAndRotation_Implementation(const FVector2D& Input)
-{
-	FVector2D inputTemp = Input;
-
-	RotToCamera(YawRotSpeed);
-
-	inputTemp.Normalize();
-	FVector2D inputDir;
-	
-	inputDir = inputTemp.GetRotated(GetActorRotation().Yaw);
-
-	MovementToInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
-}
-
-
-// 入力した方向に移動
-void AMSGOCharacter::MovementToInput_Implementation(FVector InInputDir, float InScaleValue)
-{
-	this->AddMovementInput(InInputDir, InScaleValue);
 }
 
 // 移動終了
@@ -240,56 +209,24 @@ void AMSGOCharacter::EndMove()
 
 	if (MoveType == EMOVE_TYPE::Dash)
 	{
-		OnReleaseDash();
+		//OnReleaseDash();
 	}
 }
 
-// 視点操作
-void AMSGOCharacter::Look(const FInputActionValue& Value)
+void AMSGOCharacter::InputMove(const FVector2D& Input)
 {
-	FVector2D LookInput = Value.Get<FVector2D>();
+	FVector2D inputTemp = Input;
 
-	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
-	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
-}
+	RotToCamera(YawRotSpeed);
 
-// カメラの向いている方に向く
-void AMSGOCharacter::RotToCamera_Implementation(float InRotSpeed)
-{
-	// カメラの角度(Yawのみ)を取得
-	FRotator cameraRot = FollowCamera->GetComponentRotation();
-	cameraRot.Pitch = cameraRot.Roll = 0.0f;
+	inputTemp.Normalize();
+	FVector2D inputDir = inputTemp.GetRotated(Controller->GetControlRotation().Yaw);
 
-	// 自身の角度(Yawのみ)を取得
-	FRotator nowRot = GetActorRotation();
-	nowRot.Pitch = nowRot.Roll = 0.0f;
-
-	// カメラの向いている方向に回転
-	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
-
-	SetActorRotation(MyRotate);
+	AddMovementInput(FVector(inputDir.X, inputDir.Y, 0.0), 1.0);
 }
 
 // ダッシュ　入力
-void AMSGOCharacter::OnPressDash_Implementation()
-{
-	BeginDash();
-}
-
-// ダッシュ　リリース
-void AMSGOCharacter::OnReleaseDash_Implementation()
-{
-	EndDash();
-}
-
-// ダッシュ 入力中
-void AMSGOCharacter::UpdateDash_Implementation()
-{
-	OnGoingDash();
-}
-
-// ダッシュ開始処理
-void AMSGOCharacter::BeginDash_Implementation()
+void AMSGOCharacter::OnPressDash()
 {
 	// オーバーヒート中は処理しない
 	if (StatusComponent->GetIsOverHeat())
@@ -298,12 +235,17 @@ void AMSGOCharacter::BeginDash_Implementation()
 	}
 
 	// 初速を代入
-	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().InitSpeed;
-	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().InitSpeed;
-	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
-	GetCharacterMovement()->GravityScale = 0.0;
+	//MSGOCharacterMovement->MaxWalkSpeed = StatusComponent->GetStatusParameter().InitSpeed;
+	//MSGOCharacterMovement->MaxFlySpeed = StatusComponent->GetStatusParameter().InitSpeed;
+	//MSGOCharacterMovement->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
+	//MSGOCharacterMovement->GravityScale = 0.0;
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	MSGOCharacterMovement->Server_SetMaxWalkSpeed(StatusComponent->GetStatusParameter().InitSpeed);
+	MSGOCharacterMovement->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().InitSpeed);
+	MSGOCharacterMovement->Server_SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
+	MSGOCharacterMovement->Server_SetGravityScale(0.0);
+
+	MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Flying);
 
 	// 移動タイプをダッシュにする
 	MoveType = EMOVE_TYPE::Dash;
@@ -315,43 +257,22 @@ void AMSGOCharacter::BeginDash_Implementation()
 	// 最高速度に移行するまでの秒数を算出
 	TargetSeconds = UMSGOBlueprintFunctionLibrary::FrameToSeconds(StatusComponent->GetStatusParameter().TransitionFrame_MaxSpeed);
 
+
 }
 
-// ダッシュ終了処理
-void AMSGOCharacter::EndDash_Implementation()
+// ダッシュ　リリース
+void AMSGOCharacter::OnReleaseDash()
 {
 	if (StatusComponent->GetIsOverHeat())
 	{
 		return;
 	}
 
-	GetCharacterMovement()->MaxWalkSpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
-	GetCharacterMovement()->MaxFlySpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
-	GetCharacterMovement()->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
-	GetCharacterMovement()->GravityScale = 1.0f;
-
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
-	// 移動タイプを歩行に戻す
-	MoveType = EMOVE_TYPE::Walk;
-
-	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
-	{
-		NowJumpStatus = EJUMP_STATUS::Falling;
-	}
-
-	//if (NowJumpStatus == EJUMP_STATUS::Idle)
-	{
-		StatusComponent->EndBoost_Dash();
-	}
-		
-
-	BoostMoveTimer = 0.f;
-	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
+	EndDash();
 }
 
-// ダッシュ中処理
-void AMSGOCharacter::OnGoingDash_Implementation()
+// ダッシュ 入力中
+void AMSGOCharacter::UpdateDash()
 {
 	// オーバーヒート中は処理しない
 	if (StatusComponent->GetIsOverHeat() || MoveType != EMOVE_TYPE::Dash)
@@ -362,7 +283,7 @@ void AMSGOCharacter::OnGoingDash_Implementation()
 	// ニュートラル時の移動処理
 	if (MoveInput.Length() <= 0.0f)
 	{
-		InputMoveAndRotation(FVector2D(1.0f, 0.0f));
+		InputMove(FVector2D(1.0f, 0.0f));
 	}
 
 	BoostMoveTimer += this->GetWorld()->DeltaTimeSeconds;
@@ -409,7 +330,6 @@ void AMSGOCharacter::OnGoingDash_Implementation()
 
 		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate, EEasingFunc::EaseOut);
 
-
 		break;
 	default:
 		break;
@@ -417,30 +337,48 @@ void AMSGOCharacter::OnGoingDash_Implementation()
 	}
 
 	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
-	//GetCharacterMovement()->MaxWalkSpeed = GetCharacterMovement()->MaxFlySpeed = moveSpeed;
-	Server_ChangeMaxMoveSpeed_Implementation(moveSpeed);
+	//MSGOCharacterMovement->MaxWalkSpeed = MSGOCharacterMovement->MaxFlySpeed = moveSpeed;
+
+	MSGOCharacterMovement->Server_SetMaxWalkSpeed(moveSpeed);
+	MSGOCharacterMovement->Server_SetMaxFlySpeed(moveSpeed);
 }
 
-// 最高速度を変更する
-void AMSGOCharacter::Server_ChangeMaxMoveSpeed_Implementation(const float& InSpeed)
+// ダッシュ終了処理
+void AMSGOCharacter::EndDash()
 {
-	ChangeMaxMoveSpeed_Implementation(InSpeed);
-}
+	//MSGOCharacterMovement->MaxWalkSpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
+	//MSGOCharacterMovement->MaxFlySpeed = StatusComponent->GetStatusParameter().MaxWalkSpeed;
+	//MSGOCharacterMovement->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
+	//MSGOCharacterMovement->GravityScale = 1.0f;
 
-void AMSGOCharacter::ChangeMaxMoveSpeed_Implementation(const float& InSpeed)
-{
-	UCharacterMovementComponent* movementComp = GetCharacterMovement();
-	if (!movementComp)
+	MSGOCharacterMovement->Server_SetMaxWalkSpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
+	MSGOCharacterMovement->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
+	MSGOCharacterMovement->Server_SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
+	MSGOCharacterMovement->Server_SetGravityScale(1.f);
+
+	MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Walking);
+
+	// 移動タイプを歩行に戻す
+	MoveType = EMOVE_TYPE::Walk;
+
+	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
-		return;
+		NowJumpStatus = EJUMP_STATUS::Falling;
 	}
 
-	movementComp->MaxWalkSpeed = movementComp->MaxFlySpeed = InSpeed;
+	//if (NowJumpStatus == EJUMP_STATUS::Idle)
+	{
+		StatusComponent->EndBoost_Dash();
+	}
+
+
+	BoostMoveTimer = 0.f;
+	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
 }
 
 
 // ジャンプ　入力
-void AMSGOCharacter::OnPressJump_Implementation()
+void AMSGOCharacter::OnPressJump()
 {
 	// オバヒ中ならただのジャンプ
 	if (MoveType == EMOVE_TYPE::Walk && StatusComponent->GetIsOverHeat())
@@ -451,29 +389,29 @@ void AMSGOCharacter::OnPressJump_Implementation()
 
 	switch (NowJumpStatus)
 	{
-	// アイドル
+		// アイドル
 	case EJUMP_STATUS::Idle:
 		// ジャンプ開始時の高さを種痘
 		BeginRiseHeight = GetActorLocation().Z;
 		// ジャンプのステートを上昇に変える
 		NowJumpStatus = EJUMP_STATUS::Rising;
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+		MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Flying);
 
 		break;
 	case EJUMP_STATUS::Falling:
 		NowJumpStatus = EJUMP_STATUS::Hovering;
-		GetCharacterMovement()->Velocity.Z = 0.0f;
+		MSGOCharacterMovement->Velocity.Z = 0.0f;
 
 		break;
 	default:
 		break;
 	}
-	
+
 	StatusComponent->BeginBoost_Jump();
 
 }
 // ジャンプ　リリース
-void AMSGOCharacter::OnReleaseJump_Implementation()
+void AMSGOCharacter::OnReleaseJump()
 {
 	if (MoveType == EMOVE_TYPE::Dash)
 	{
@@ -485,7 +423,7 @@ void AMSGOCharacter::OnReleaseJump_Implementation()
 	EndJump();
 }
 // ジャンプ　入力中
-void AMSGOCharacter::UpdateJump_Implementation()
+void AMSGOCharacter::UpdateJump()
 {
 	// オバヒ中なら処理しない
 	if (StatusComponent->GetIsOverHeat())
@@ -495,7 +433,7 @@ void AMSGOCharacter::UpdateJump_Implementation()
 
 	switch (NowJumpStatus)
 	{
-	// 上昇
+		// 上昇
 	case EJUMP_STATUS::Rising:
 		// 高度上限に達したらホバリングに移行
 		if (IsHeightLimit())
@@ -510,15 +448,15 @@ void AMSGOCharacter::UpdateJump_Implementation()
 		}
 
 		break;
-	// ホバリング
+		// ホバリング
 	case EJUMP_STATUS::Hovering:
 		if (MoveType == EMOVE_TYPE::Walk)
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
-			GetCharacterMovement()->GravityScale = 0.1f;
+			MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Falling);
+			MSGOCharacterMovement->GravityScale = 0.1f;
 		}
 		break;
-	// 落下中
+		// 落下中
 	case EJUMP_STATUS::Falling:
 		NowJumpStatus = EJUMP_STATUS::Hovering;
 
@@ -529,12 +467,12 @@ void AMSGOCharacter::UpdateJump_Implementation()
 }
 
 // ジャンプ終了処理
-void AMSGOCharacter::EndJump_Implementation()
+void AMSGOCharacter::EndJump()
 {
 	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		GetCharacterMovement()->GravityScale = 1.0f;
+		MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Walking);
+		MSGOCharacterMovement->GravityScale = 1.0f;
 
 		NowJumpStatus = EJUMP_STATUS::Falling;
 
@@ -555,6 +493,54 @@ void AMSGOCharacter::OnOverHeat()
 
 
 
+// 視点操作
+void AMSGOCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookInput = Value.Get<FVector2D>();
+
+	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
+}
+
+
+// カメラの向いている方に向く
+//void AMSGOCharacter::RotToCamera(float InRotSpeed)
+//{
+//	// カメラの角度(Yawのみ)を取得
+//	FRotator cameraRot = FollowCamera->GetComponentRotation();
+//	cameraRot.Pitch = cameraRot.Roll = 0.0f;
+//
+//	// 自身の角度(Yawのみ)を取得
+//	FRotator nowRot = GetActorRotation();
+//	nowRot.Pitch = nowRot.Roll = 0.0f;
+//
+//	// カメラの向いている方向に回転
+//	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
+//	
+//	SetActorRotation(MyRotate);
+//}
+
+// カメラの向いている方に向く
+void AMSGOCharacter::RotToCamera/*_Implementation*/(float InRotSpeed)
+{
+	// カメラの角度(Yawのみ)を取得
+	FRotator cameraRot = FollowCamera->GetComponentRotation();
+	cameraRot.Pitch = cameraRot.Roll = 0.0f;
+
+	// 自身の角度(Yawのみ)を取得
+	FRotator nowRot = GetActorRotation();
+	nowRot.Pitch = nowRot.Roll = 0.0f;
+
+	// カメラの向いている方向に回転
+	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
+
+	SetActorRotation(MyRotate);
+}
+//bool AMSGOCharacter::RotToCamera_Validate(float InRotSpeed)
+//{
+//	return true;
+//}
+
 
 // 高度上限かのチェック
 // return		trueなら高度上限
@@ -563,19 +549,16 @@ bool AMSGOCharacter::IsHeightLimit()
 	return GetActorLocation().Z - BeginRiseHeight >= StatusComponent->GetStatusParameter().JumpRiseHeight;
 }
 
-
 // 被弾処理
 void AMSGOCharacter::AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam)
 {
 	StatusComponent->AddDamage(InAttackPowerParam);
 }
 
-void AMSGOCharacter::OnAttack_Implementation()
+// キャラの向きの変数が更新された際に呼ばれる
+void AMSGOCharacter::OnRep_MyRotate()
 {
-	WakeAttackObject();
-}
+	SetActorRotation(MyRotate);
 
-void AMSGOCharacter::OnRep_MoveInput()
-{
-	UKismetSystemLibrary::PrintString(this, TEXT("ONRep:MoveInput"));
+	//UKismetSystemLibrary::PrintString(this, HasAuthority() ? TEXT("true") : TEXT("false"));
 }

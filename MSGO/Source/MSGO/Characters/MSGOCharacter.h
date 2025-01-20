@@ -47,7 +47,7 @@ class UDamageCollision;
 //struct FAttackCollisionPowerParameter;
 
 
-UCLASS(config=Game)
+UCLASS(config = Game)
 class MSGO_API AMSGOCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -64,8 +64,12 @@ public:
 	class UCameraComponent* FollowCamera;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
 	float TurnRateGamepad;
+
+private:
+	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMSGOCharacterMovementComponent> MSGOCharacterMovement;
 
 public:
 	// 機体ID
@@ -84,7 +88,7 @@ protected:
 	// MappingContext
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* MappingContext;
-	
+
 	// InputAction:攻撃
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Attack;
@@ -92,7 +96,7 @@ protected:
 	// InputAction:アクション
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_Action;
-	
+
 	// InputAction:ロックオン
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* IA_LockOn;
@@ -151,11 +155,11 @@ protected:
 	TObjectPtr<UDamageCollision> DamageCollision;
 
 	// 移動入力値
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MoveInput, /*Replicated,*/ Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Action")
 	FVector2D MoveInput;
 
 	// 移動タイプ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_MoveType, Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
 	EMOVE_TYPE MoveType;
 
 	// Yawの回転速度
@@ -198,16 +202,15 @@ private:
 	float BeginRiseHeight;
 
 	// キャラの向き用の変数
-	//UPROPERTY(ReplicatedUsing = OnRep_MyRotate)
+	UPROPERTY(ReplicatedUsing = OnRep_MyRotate)
 	FRotator MyRotate = FRotator::ZeroRotator;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<AAttackCollision> AttackCollision;
 
-
 public:
-	AMSGOCharacter();
+	AMSGOCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -217,62 +220,38 @@ public:
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	
+
 protected:
-
-/////////////////////////////////////////////////////
-// 入力回り
-/////////////////////////////////////////////////////
-
 	// 移動処理
-	//UFUNCTION(Reliable, Server)
-	void OnMove(const FInputActionValue& Value);
-
-	UFUNCTION(Reliable, Server)
-	void Server_SetMoveInput(const FVector2D& InValue);
-	UFUNCTION(Reliable, NetMulticast)
-	void SetMoveInput(const FVector2D& InValue);
+	void Move(const FInputActionValue& Value);
 
 	// 移動終了
 	void EndMove();
 
-	UFUNCTION(Reliable, Server)
-	void InputMoveAndRotation(const FVector2D& Input);
+	void InputMove(const FVector2D& Input);
 
 	// 視点操作
 	void Look(const FInputActionValue& Value);
 
 	// ダッシュ　入力
-	UFUNCTION(Reliable, Server)
 	void OnPressDash();
 	// ダッシュ　リリース
-	UFUNCTION(Reliable, Server)
 	void OnReleaseDash();
 	// ダッシュ　入力中
-	UFUNCTION(Reliable, Server)
 	void UpdateDash();
 
-	// ダッシュ開始
-	UFUNCTION(Reliable, NetMulticast)
-	void BeginDash();
 	// ダッシュ終了処理
-	UFUNCTION(Reliable, NetMulticast)
 	void EndDash();
-	// ダッシュ中
-	UFUNCTION(Reliable, NetMulticast)
-	void OnGoingDash();
 
 	// ジャンプ　入力
-	UFUNCTION(Reliable, Server)
 	void OnPressJump();
 	// ジャンプ　リリース
-	UFUNCTION(Reliable, Server)
 	void OnReleaseJump();
 	// ジャンプ　入力中
-	UFUNCTION(Reliable, Server)
 	void UpdateJump();
 
 	// ジャンプ終了処理
-	UFUNCTION(Reliable, Server)
 	void EndJump();
 
 	// オーバーヒート時の処理
@@ -287,36 +266,34 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	// キャラの向きの変数が更新された際に呼ばれる
 	UFUNCTION()
-	void OnRep_MoveInput();
-
-	UFUNCTION()
-	void OnRep_MoveType() {};
+	void OnRep_MyRotate();
 
 public:
 	// キャラクターステータスコンポーネントの取得
-	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "MSGO|Component")
 	UCharacterStatusComponent* GetCharacterStatusComponent()
 	{
 		return StatusComponent;
 	}
 
-public:
-/////////////////////////////////////////////////////
-// 移動系
-/////////////////////////////////////////////////////
+	// CharacterMovementComponentの取得
+	UFUNCTION(BlueprintPure, Category = "MSGO|Component", meta = (DisplayName = "GetCharacterMovement"))
+	UMSGOCharacterMovementComponent* GetCastedCharacterMovement()
+	{
+		return Cast<UMSGOCharacterMovementComponent>(GetCharacterMovement());
+	}
 
+public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	// カメラの向いている方に向く
-	UFUNCTION(BlueprintCallable, Reliable, NetMulticast)
+	UFUNCTION(BlueprintCallable/*, Reliable, Server*/)
 	void RotToCamera(float InRotSpeed);
-
-	UFUNCTION(Reliable, NetMulticast)
-	void MovementToInput(FVector InInputDir, float InScaleValue);
 
 	// 移動タイプの取得
 	EMOVE_TYPE GetNowMoveType()
@@ -328,26 +305,9 @@ public:
 	{
 		return NowJumpStatus;
 	}
-	
-	// 最高速度を変更する
-	UFUNCTION(Reliable, Server)
-	void Server_ChangeMaxMoveSpeed(const float& InSpeed);
-	UFUNCTION(Reliable, NetMulticast)
-	void ChangeMaxMoveSpeed(const float& InSpeed);
 
-
-/////////////////////////////////////////////////////
-// 攻撃系
-/////////////////////////////////////////////////////
 	// 被弾処理
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
-	UFUNCTION(Reliable, Server)
-	void OnAttack();
-
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void WakeAttackObject();
 
 };
-
