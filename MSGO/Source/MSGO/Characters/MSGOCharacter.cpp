@@ -50,15 +50,10 @@ AMSGOCharacter::AMSGOCharacter(const FObjectInitializer& ObjectInitializer)
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	MSGOCharacterMovement = GetCastedCharacterMovement();
-	if (MSGOCharacterMovement)
-	{
-		// Configure character movement
-		MSGOCharacterMovement->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-		MSGOCharacterMovement->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
-		MSGOCharacterMovement->SetIsReplicated(true);
-		MSGOCharacterMovement->bUseControllerDesiredRotation = true;
-	}
+	GetCastedCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCastedCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	GetCastedCharacterMovement()->SetIsReplicated(true);
+	GetCastedCharacterMovement()->bUseControllerDesiredRotation = true;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -71,7 +66,8 @@ AMSGOCharacter::AMSGOCharacter(const FObjectInitializer& ObjectInitializer)
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	MoveType = EMOVE_TYPE::Walk;
+	//MoveType = EMOVE_TYPE::Walk;
+	SetMoveType(EMOVE_TYPE::Walk);
 
 	YawRotSpeed = 10.f;
 	DashRiseSpeed = 1.f;
@@ -83,7 +79,8 @@ AMSGOCharacter::AMSGOCharacter(const FObjectInitializer& ObjectInitializer)
 	BeginRiseHeight = 0.0;
 
 	NowBoostSpeedStatus = EBOOST_SPEED_STATUS::InitSpeed;
-	NowJumpStatus = EJUMP_STATUS::Idle;
+	//NowJumpStatus = EJUMP_STATUS::Idle;
+	SetNowJumpStatus(NowJumpStatus);
 
 	FActorSpawnParameters spawnParam;
 	spawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -115,12 +112,12 @@ void AMSGOCharacter::BeginPlay()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	MSGOCharacterMovement->JumpZVelocity = 700.f;
-	MSGOCharacterMovement->AirControl = 0.35f;
-	MSGOCharacterMovement->MaxWalkSpeed = MaxWalkSpeed;
-	MSGOCharacterMovement->MaxAcceleration = MaxAcceleration;
-	MSGOCharacterMovement->MinAnalogWalkSpeed = 20.f;
-	MSGOCharacterMovement->BrakingDecelerationWalking = 2000.f;
+	GetCastedCharacterMovement()->JumpZVelocity = 700.f;
+	GetCastedCharacterMovement()->AirControl = 0.35f;
+	GetCastedCharacterMovement()->SetMaxWalkSpeed(MaxWalkSpeed);
+	GetCastedCharacterMovement()->SetMaxAcceleration(MaxAcceleration);
+	GetCastedCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+	GetCastedCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	AttackCollision = GetWorld()->SpawnActor<AAttackCollision>(AAttackCollision::StaticClass());
 	if (AttackCollision)
@@ -131,16 +128,21 @@ void AMSGOCharacter::BeginPlay()
 	MyRotate = GetActorRotation();
 	//APlayerCameraManager* cameraManager = UGameplayStati
 
+	CurrentMovementMode = PrevMovementMode = GetCastedCharacterMovement()->MovementMode;
+
 }
 
 void AMSGOCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (MSGOCharacterMovement->MovementMode == EMovementMode::MOVE_Walking)
+	CurrentMovementMode = GetCastedCharacterMovement()->MovementMode;
+	if (CurrentMovementMode != PrevMovementMode && CurrentMovementMode == EMovementMode::MOVE_Walking)
 	{
 		BeginRiseHeight = 0.f;
-		NowJumpStatus = EJUMP_STATUS::Idle;
+
+		//NowJumpStatus = EJUMP_STATUS::Idle;
+		SetNowJumpStatus(EJUMP_STATUS::Idle);
 	}
 
 	//if (AttackCollision && AttackCollision->GetIsUsing())
@@ -149,6 +151,8 @@ void AMSGOCharacter::Tick(float DeltaSeconds)
 	//}
 
 	//UGameplayStatics::GetGame
+
+	PrevMovementMode = GetCastedCharacterMovement()->MovementMode;
 }
 
 void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -157,6 +161,8 @@ void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	// レプリケートする変数を追加
 	DOREPLIFETIME(AMSGOCharacter, MyRotate);
+	DOREPLIFETIME(AMSGOCharacter, NowJumpStatus);
+	DOREPLIFETIME(AMSGOCharacter, MoveType);
 
 }
 
@@ -240,15 +246,20 @@ void AMSGOCharacter::OnPressDash()
 	//MSGOCharacterMovement->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
 	//MSGOCharacterMovement->GravityScale = 0.0;
 
-	MSGOCharacterMovement->Server_SetMaxWalkSpeed(StatusComponent->GetStatusParameter().InitSpeed);
-	MSGOCharacterMovement->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().InitSpeed);
-	MSGOCharacterMovement->Server_SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
-	MSGOCharacterMovement->Server_SetGravityScale(0.0);
+	GetCastedCharacterMovement()->SetMaxWalkSpeed(StatusComponent->GetStatusParameter().InitSpeed);
+	//GetCastedCharacterMovement()->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().InitSpeed);
 
-	MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Flying);
+	const int32 initSpeedPPT = StatusComponent->GetStatusParameter().InitSpeed * 1000;
+	GetCastedCharacterMovement()->SetMaxFlySpeedPPT(initSpeedPPT);
+
+	GetCastedCharacterMovement()->SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
+	GetCastedCharacterMovement()->SetGravityScale(0.0);
+
+	GetCastedCharacterMovement()->SetMyMovementMode(EMovementMode::MOVE_Flying);
 
 	// 移動タイプをダッシュにする
-	MoveType = EMOVE_TYPE::Dash;
+	//MoveType = EMOVE_TYPE::Dash;
+	SetMoveType(EMOVE_TYPE::Dash);
 
 	AddActorWorldOffset(FVector(0.0, 0.0, 10.0f));
 
@@ -291,11 +302,15 @@ void AMSGOCharacter::UpdateDash()
 	float targetSecondsRate = BoostMoveTimer / TargetSeconds;
 	float moveSpeed = 0.0f;
 
+	int32 moveSpeedPPT = 0;
+
 	switch (NowBoostSpeedStatus)
 	{
 		// 初速
 	case EBOOST_SPEED_STATUS::InitSpeed:
 		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().InitSpeed, StatusComponent->GetStatusParameter().MaxSpeed, targetSecondsRate, EEasingFunc::EaseIn);
+
+		moveSpeedPPT = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().InitSpeed * 1000, StatusComponent->GetStatusParameter().MaxSpeed* 1000, targetSecondsRate, EEasingFunc::EaseIn);
 
 		if (targetSecondsRate >= 1.0f)
 		{
@@ -309,6 +324,8 @@ void AMSGOCharacter::UpdateDash()
 		// 最高速度
 	case EBOOST_SPEED_STATUS::MaxSpeed:
 		moveSpeed = StatusComponent->GetStatusParameter().MaxSpeed;
+
+		moveSpeedPPT = StatusComponent->GetStatusParameter().MaxSpeed * 1000;
 
 		if (targetSecondsRate >= 1.0f)
 		{
@@ -329,6 +346,8 @@ void AMSGOCharacter::UpdateDash()
 		}
 
 		moveSpeed = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().MaxSpeed, StatusComponent->GetStatusParameter().CrusingSpeed, targetSecondsRate, EEasingFunc::EaseOut);
+		moveSpeedPPT = UKismetMathLibrary::Ease(StatusComponent->GetStatusParameter().MaxSpeed * 1000, StatusComponent->GetStatusParameter().CrusingSpeed * 1000, targetSecondsRate, EEasingFunc::EaseIn);
+
 
 		break;
 	default:
@@ -339,8 +358,9 @@ void AMSGOCharacter::UpdateDash()
 	//UKismetSystemLibrary::PrintString(this, FString::SanitizeFloat(moveSpeed));
 	//MSGOCharacterMovement->MaxWalkSpeed = MSGOCharacterMovement->MaxFlySpeed = moveSpeed;
 
-	MSGOCharacterMovement->Server_SetMaxWalkSpeed(moveSpeed);
-	MSGOCharacterMovement->Server_SetMaxFlySpeed(moveSpeed);
+
+	GetCastedCharacterMovement()->SetMaxWalkSpeed(moveSpeed);
+	GetCastedCharacterMovement()->SetMaxFlySpeedPPT(moveSpeedPPT);
 }
 
 // ダッシュ終了処理
@@ -351,19 +371,25 @@ void AMSGOCharacter::EndDash()
 	//MSGOCharacterMovement->MaxAcceleration = StatusComponent->GetStatusParameter().MaxAcceleration;
 	//MSGOCharacterMovement->GravityScale = 1.0f;
 
-	MSGOCharacterMovement->Server_SetMaxWalkSpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
-	MSGOCharacterMovement->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
-	MSGOCharacterMovement->Server_SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
-	MSGOCharacterMovement->Server_SetGravityScale(1.f);
+	GetCastedCharacterMovement()->SetMaxWalkSpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
+	//GetCastedCharacterMovement()->Server_SetMaxFlySpeed(StatusComponent->GetStatusParameter().MaxWalkSpeed);
 
-	MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Walking);
+	const int32 maxWalkSpeedPPT = StatusComponent->GetStatusParameter().MaxWalkSpeed * 1000;
+	GetCastedCharacterMovement()->SetMaxFlySpeedPPT(maxWalkSpeedPPT);
+
+	GetCastedCharacterMovement()->SetMaxAcceleration(StatusComponent->GetStatusParameter().MaxAcceleration);
+	GetCastedCharacterMovement()->SetGravityScale(1.f);
+
+	GetCastedCharacterMovement()->SetMyMovementMode(EMovementMode::MOVE_Walking);
 
 	// 移動タイプを歩行に戻す
-	MoveType = EMOVE_TYPE::Walk;
+	//MoveType = EMOVE_TYPE::Walk;
+	SetMoveType(EMOVE_TYPE::Walk);
 
 	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
-		NowJumpStatus = EJUMP_STATUS::Falling;
+		//NowJumpStatus = EJUMP_STATUS::Falling;
+		SetNowJumpStatus(EJUMP_STATUS::Falling);
 	}
 
 	//if (NowJumpStatus == EJUMP_STATUS::Idle)
@@ -386,6 +412,7 @@ void AMSGOCharacter::OnPressJump()
 		Jump();
 		return;
 	}
+	FVector movementVelocity = FVector::ZeroVector;
 
 	switch (NowJumpStatus)
 	{
@@ -394,13 +421,20 @@ void AMSGOCharacter::OnPressJump()
 		// ジャンプ開始時の高さを種痘
 		BeginRiseHeight = GetActorLocation().Z;
 		// ジャンプのステートを上昇に変える
-		NowJumpStatus = EJUMP_STATUS::Rising;
-		MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Flying);
+		//NowJumpStatus = EJUMP_STATUS::Rising;
+		SetNowJumpStatus(EJUMP_STATUS::Rising);
+
+		GetCastedCharacterMovement()->SetMyMovementMode(EMovementMode::MOVE_Flying);
 
 		break;
 	case EJUMP_STATUS::Falling:
-		NowJumpStatus = EJUMP_STATUS::Hovering;
-		MSGOCharacterMovement->Velocity.Z = 0.0f;
+		//NowJumpStatus = EJUMP_STATUS::Hovering;
+		SetNowJumpStatus(EJUMP_STATUS::Hovering);
+
+		movementVelocity = GetCastedCharacterMovement()->Velocity;
+		movementVelocity.Z = 0.f;
+		//GetCastedCharacterMovement()->Velocity.Z = 0.0f;
+		GetCastedCharacterMovement()->SetVelocity(movementVelocity);
 
 		break;
 	default:
@@ -438,13 +472,17 @@ void AMSGOCharacter::UpdateJump()
 		// 高度上限に達したらホバリングに移行
 		if (IsHeightLimit())
 		{
-			NowJumpStatus = EJUMP_STATUS::Hovering;
+			//NowJumpStatus = EJUMP_STATUS::Hovering;
+			SetNowJumpStatus(EJUMP_STATUS::Hovering);
 		}
 		// 高度上限でなければ上昇
 		else
 		{
-			FVector riseOffset = FVector(0, 0, StatusComponent->GetStatusParameter().JumpRiseSpeed) * 100.0f * GetWorld()->GetDeltaSeconds();
-			AddActorWorldOffset(riseOffset);
+			//FVector riseOffset = FVector(0, 0, StatusComponent->GetStatusParameter().JumpRiseSpeed) * 100.0f * GetWorld()->GetDeltaSeconds();
+			//AddActorWorldOffset(riseOffset);
+			
+			AddMovementInput(FVector(0.f, 0.f, 1.f));
+
 		}
 
 		break;
@@ -452,13 +490,14 @@ void AMSGOCharacter::UpdateJump()
 	case EJUMP_STATUS::Hovering:
 		if (MoveType == EMOVE_TYPE::Walk)
 		{
-			MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Falling);
-			MSGOCharacterMovement->GravityScale = 0.1f;
+			GetCastedCharacterMovement()->SetMyMovementMode(EMovementMode::MOVE_Falling);
+			GetCastedCharacterMovement()->SetGravityScale(0.1f);
 		}
 		break;
 		// 落下中
 	case EJUMP_STATUS::Falling:
-		NowJumpStatus = EJUMP_STATUS::Hovering;
+		//NowJumpStatus = EJUMP_STATUS::Hovering;
+		SetNowJumpStatus(EJUMP_STATUS::Hovering);
 
 		break;
 	default:
@@ -471,10 +510,11 @@ void AMSGOCharacter::EndJump()
 {
 	if (NowJumpStatus == EJUMP_STATUS::Rising || NowJumpStatus == EJUMP_STATUS::Hovering)
 	{
-		MSGOCharacterMovement->Server_SetMovementMode(EMovementMode::MOVE_Walking);
-		MSGOCharacterMovement->GravityScale = 1.0f;
+		GetCastedCharacterMovement()->SetMyMovementMode(EMovementMode::MOVE_Walking);
+		GetCastedCharacterMovement()->SetGravityScale(1.0f);
 
-		NowJumpStatus = EJUMP_STATUS::Falling;
+		//NowJumpStatus = EJUMP_STATUS::Falling;
+		SetNowJumpStatus(EJUMP_STATUS::Falling);
 
 	}
 
@@ -501,24 +541,6 @@ void AMSGOCharacter::Look(const FInputActionValue& Value)
 	AddControllerYawInput(LookInput.X * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 	AddControllerPitchInput((LookInput.Y * -1.0) * TurnRateGamepad * GetWorld()->GetDeltaSeconds());
 }
-
-
-// カメラの向いている方に向く
-//void AMSGOCharacter::RotToCamera(float InRotSpeed)
-//{
-//	// カメラの角度(Yawのみ)を取得
-//	FRotator cameraRot = FollowCamera->GetComponentRotation();
-//	cameraRot.Pitch = cameraRot.Roll = 0.0f;
-//
-//	// 自身の角度(Yawのみ)を取得
-//	FRotator nowRot = GetActorRotation();
-//	nowRot.Pitch = nowRot.Roll = 0.0f;
-//
-//	// カメラの向いている方向に回転
-//	MyRotate = FMath::RInterpTo(nowRot, cameraRot, GetWorld()->GetDeltaSeconds(), InRotSpeed);
-//	
-//	SetActorRotation(MyRotate);
-//}
 
 // カメラの向いている方に向く
 void AMSGOCharacter::RotToCamera/*_Implementation*/(float InRotSpeed)
@@ -561,4 +583,51 @@ void AMSGOCharacter::OnRep_MyRotate()
 	SetActorRotation(MyRotate);
 
 	//UKismetSystemLibrary::PrintString(this, HasAuthority() ? TEXT("true") : TEXT("false"));
+}
+
+// 移動タイプのセット
+void AMSGOCharacter::SetMoveType(const EMOVE_TYPE InMoveType)
+{
+	MoveType = InMoveType;
+
+	if (!HasAuthority())
+	{
+		Server_SetNowMoveType(InMoveType);
+	}
+}
+
+// サーバー側の移動タイプのセット
+void AMSGOCharacter::Server_SetNowMoveType_Implementation(const EMOVE_TYPE InMoveType)
+{
+	MoveType = InMoveType;
+}
+
+// 移動タイプが変更された際に呼ばれる関数
+void AMSGOCharacter::OnRep_MoveType()
+{
+
+}
+
+
+
+// ジャンプ状態のセット
+void AMSGOCharacter::SetNowJumpStatus(const EJUMP_STATUS InJumpStatus)
+{
+	NowJumpStatus = InJumpStatus;
+
+	if (!HasAuthority())
+	{
+		Server_SetNowJumpStatus(InJumpStatus);
+	}
+}
+
+// ジャンプ状態のセット
+void AMSGOCharacter::Server_SetNowJumpStatus_Implementation(const EJUMP_STATUS InJumpStatus)
+{
+	NowJumpStatus = InJumpStatus;
+}
+// ジャンプ状態が変更された際に呼ばれる関数
+void AMSGOCharacter::OnRep_NowJumpStatus()
+{
+
 }

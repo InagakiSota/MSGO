@@ -67,9 +67,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Input)
 	float TurnRateGamepad;
 
-private:
-	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UMSGOCharacterMovementComponent> MSGOCharacterMovement;
+//private:
+//	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+//	TObjectPtr<UMSGOCharacterMovementComponent> MSGOCharacterMovement;
 
 public:
 	// 機体ID
@@ -159,7 +159,7 @@ protected:
 	FVector2D MoveInput;
 
 	// 移動タイプ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Action", ReplicatedUsing = OnRep_MoveType)
 	EMOVE_TYPE MoveType;
 
 	// Yawの回転速度
@@ -174,9 +174,14 @@ protected:
 	EBOOST_SPEED_STATUS NowBoostSpeedStatus;
 
 	// ジャンプのステータス
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), ReplicatedUsing = OnRep_NowJumpStatus)
 	EJUMP_STATUS NowJumpStatus;
 
+	// 現在のMovementMoode
+	EMovementMode CurrentMovementMode;
+
+	// 前フレームのMovementMode
+	EMovementMode PrevMovementMode;
 
 private:
 	// 前フレームの移動入力値
@@ -295,19 +300,52 @@ public:
 	UFUNCTION(BlueprintCallable/*, Reliable, Server*/)
 	void RotToCamera(float InRotSpeed);
 
+
+	// 被弾処理
+	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
+
+
+	//====================================
+	// ゲッター・セッター
+	//====================================
 	// 移動タイプの取得
-	EMOVE_TYPE GetNowMoveType()
+	UFUNCTION(BlueprintPure, Category = "MSGOCharacter")
+	EMOVE_TYPE GetNowMoveType() const
 	{
 		return MoveType;
 	}
+
+	// 移動タイプのセット
+	UFUNCTION(BlueprintCallable, Category = "MSGOCharacter")
+	void SetMoveType(const EMOVE_TYPE InMoveType);
+
+	// サーバー側の移動タイプのセット
+	UFUNCTION(Server,Reliable)
+	void Server_SetNowMoveType(const EMOVE_TYPE InMoveType);
+
+	// 移動タイプが変更された際に呼ばれる関数
+	UFUNCTION()
+	void OnRep_MoveType();
+
 	// ジャンプ状態の取得
-	EJUMP_STATUS GetNowJumpStatus()
+	UFUNCTION(BlueprintPure, Category = "MSGOCharacter")
+	EJUMP_STATUS GetNowJumpStatus() const
 	{
 		return NowJumpStatus;
 	}
 
-	// 被弾処理
-	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
+	// ジャンプ状態のセット
+	UFUNCTION(BlueprintCallable, Category = "MSGOCharacter")
+	void SetNowJumpStatus(const EJUMP_STATUS InJumpStatus);
+
+	// サーバー側のジャンプ状態のセット
+	UFUNCTION(Server, Reliable)
+	void Server_SetNowJumpStatus(const EJUMP_STATUS InJumpStatus);
+	
+	// ジャンプ状態が変更された際に呼ばれる関数
+	UFUNCTION()
+	void OnRep_NowJumpStatus();
+
 
 
 };

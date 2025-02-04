@@ -15,6 +15,8 @@ class MSGO_API UMSGOBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	// Vector*float
+
 	// フレームを秒数に変換(60fps)
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static float FrameToSeconds(const int32 InFrame);
