@@ -14,8 +14,6 @@ void AMSGOGameState::BeginPlay()
 
     UIManager = NewObject<UMSGOUIManager>();
 
-    //UIManager->SetupHPGauge(100);
-
     if (!UIManager)
     {
         return;

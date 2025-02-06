@@ -17,7 +17,9 @@ AMSGOGameMode::AMSGOGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
-	HUDClass = AMSGOHud::StaticClass();
 
 	GameStateClass = AMSGOGameState::StaticClass();
+
+	HUDClass = AMSGOHud::StaticClass();
+
 }

@@ -8,6 +8,9 @@
 #include "Components/CharacterStatusComponent.h"
 #include "Characters/MSGOCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
 
 // ゲーム開始時のセットアップ
 // @param	InCharacter	操作対象のプレイヤーキャラクター
@@ -19,6 +22,24 @@ void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
     }
 
     PlayerCharacter = InCharacter;
+
+    // WidgetBlueprintのクラスを取得
+    FString path = TEXT("/Game/UI/Widget/WBP_MSGOHud.WBP_MSGOHud_C");
+    TSubclassOf<UMyHudWidget> widgetClass = TSoftClassPtr<UMyHudWidget>(FSoftObjectPath(*path)).LoadSynchronous();
+
+    //APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+
+    APlayerController* playerController = Cast<APlayerController>(PlayerCharacter->GetController());
+
+    if (widgetClass && playerController)
+    {
+        // Widgetを作成
+        HudWidget = Cast<UMyHudWidget>(UWidgetBlueprintLibrary::Create(GetWorld(), widgetClass, playerController));
+
+        // ViewPortに追加
+        //UIRef->AddToViewport(0);
+    }
+
 
     UCharacterStatusComponent* statusComponent = PlayerCharacter->GetCharacterStatusComponent();
     if (!statusComponent)
