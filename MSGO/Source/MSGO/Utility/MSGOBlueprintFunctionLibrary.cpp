@@ -2,6 +2,7 @@
 
 
 #include "Utility/MSGOBlueprintFunctionLibrary.h"
+#include "DataTableUtils.h"
 
 // フレームを秒数に変換(60fps)
 float UMSGOBlueprintFunctionLibrary::FrameToSeconds(const int32 InFrame)
@@ -27,9 +28,11 @@ bool UMSGOBlueprintFunctionLibrary::ExportCSVFromCSVString(const FString& CSVStr
 
 bool UMSGOBlueprintFunctionLibrary::ExportCSVFromDataTable(UDataTable* DataTable, FString FileName)
 {
+#if WITH_EDITOR
     if (DataTable)
     {
         return FFileHelper::SaveStringToFile(DataTable->GetTableAsCSV(), *FileName);
     }
+#endif
     return false;
 }

@@ -97,7 +97,7 @@ void AMSGOCharacter::BeginPlay()
 
 	//UKismetSystemLibrary::PrintString(this, "MSGOCharacter:BeginPlay");
 
-	StatusComponent->SetupParameter(MachineID);
+	//StatusComponent->SetupParameter(MachineID);
 
 	// オーバーヒート時の処理をバインド
 	StatusComponent->OnOverHeatDelegate.AddUObject(this, &AMSGOCharacter::OnOverHeat);
@@ -163,6 +163,7 @@ void AMSGOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AMSGOCharacter, MyRotate);
 	DOREPLIFETIME(AMSGOCharacter, NowJumpStatus);
 	DOREPLIFETIME(AMSGOCharacter, MoveType);
+	DOREPLIFETIME(AMSGOCharacter, MachineTeamID);
 
 }
 

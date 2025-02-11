@@ -185,6 +185,12 @@ public:
 	void AddDamage(const FAttackCollisionPowerParameter& InAttackPowerParam);
 
 
+	void OnSetupDelegateBind();
+
+private:
+	void CreateBoostCalculator();
+
+
 public:
 	// オーバーヒート時のデリゲート
 	FOnOverHeatDelegate OnOverHeatDelegate;

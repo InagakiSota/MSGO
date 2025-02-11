@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-#include "ISettingsModule.h"
+#include "Developer/Settings/Public/ISettingsModule.h"
 #include "Game/StaticDataManager.h"
 
 #define LOCTEXT_NAMESPACE ""

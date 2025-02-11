@@ -181,6 +181,8 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	OnSetupHPDelegate.Clear();
 	OnChangeBoostDelegate.Clear();
 	OnSetupBoostDelegate.Clear();
+
+
 }
 
 
@@ -190,15 +192,10 @@ void UCharacterStatusComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// 所有者を取得
-	OwnerCharacter = Cast<AMSGOCharacter>(GetOwner());
-	check(OwnerCharacter);
-
-	BoostCalculator = NewObject<UBoostCalculator>();
-	check(BoostCalculator);
-
-	BoostCalculator->SetOwnerCharacter(OwnerCharacter);
-
+	if (!BoostCalculator)
+	{
+		CreateBoostCalculator();
+	}
 }
 
 void UCharacterStatusComponent::EndPlay(EEndPlayReason::Type EndPlayReason)
@@ -242,7 +239,13 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 {
 	UStaticDataManager::GetCharacterParameterData(this, InMachineID, StatusParameter);
 
+	if (!BoostCalculator)
+	{
+		CreateBoostCalculator();
+	}
+
 	BoostCalculator->SetupStatusParam(StatusParameter);
+
 
 	NowHP = MaxHP = StatusParameter.MaxHP;
 	NowDownPoint = MaxDownPoint = StatusParameter.MaxDownPoint;
@@ -257,6 +260,7 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 	{
 		OnSetupBoostDelegate.Broadcast(MaxBoostCap);
 	}
+
 }
 
 // ブースト消費開始
@@ -354,4 +358,30 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 		OnChangeHPDelegate.Broadcast(NowHP);
 	}
 
+}
+
+void UCharacterStatusComponent::OnSetupDelegateBind()
+{
+	// UIまわりのセットアップ
+	if (OnSetupHPDelegate.IsBound())
+	{
+		OnSetupHPDelegate.Broadcast(MaxHP);
+	}
+	if (OnSetupBoostDelegate.IsBound())
+	{
+		OnSetupBoostDelegate.Broadcast(MaxBoostCap);
+	}
+
+}
+
+void UCharacterStatusComponent::CreateBoostCalculator()
+{
+	// 所有者を取得
+	OwnerCharacter = Cast<AMSGOCharacter>(GetOwner());
+	check(OwnerCharacter);
+
+	BoostCalculator = NewObject<UBoostCalculator>();
+	check(BoostCalculator);
+
+	BoostCalculator->SetOwnerCharacter(OwnerCharacter);
 }

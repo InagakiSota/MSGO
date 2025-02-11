@@ -81,8 +81,14 @@ public:
 	//TEnumAsByte<ETeamID> TeamId;
 
 	// チームID
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MSGOCharacter")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MSGOCharacter", ReplicatedUsing = OnRep_MachineTeamID)
 	FMachineTeamID MachineTeamID;
+
+	UFUNCTION()
+	void OnRep_MachineTeamID()
+	{
+
+	}
 
 protected:
 	// MappingContext

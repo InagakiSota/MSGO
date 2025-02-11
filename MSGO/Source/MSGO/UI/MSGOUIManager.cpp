@@ -51,6 +51,8 @@ void UMSGOUIManager::SetupOnBeginPlay(AMSGOCharacter* InCharacter)
     statusComponent->OnSetupHPDelegate.AddUObject(this, &UMSGOUIManager::SetupHPGauge);
     statusComponent->OnChangeBoostDelegate.AddUObject(this, &UMSGOUIManager::SetNowBoost);
     statusComponent->OnSetupBoostDelegate.AddUObject(this, &UMSGOUIManager::SetupBoostGauge);
+
+    statusComponent->SetupParameter(PlayerCharacter->MachineID);
 }
 
 // 体力ゲージのセットアップ

@@ -6,7 +6,8 @@
 #include "UI/MSGOUIManager.h"
 #include "Characters/MSGOCharacter.h"
 #include "Collision/AttackCollisionPool.h"
-
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/PlayerState.h"
 
 void AMSGOGameState::BeginPlay()
 {
@@ -19,8 +20,35 @@ void AMSGOGameState::BeginPlay()
         return;
     }
 
+    //for (APlayerState* PlayerState : this->PlayerArray)
+    //{
+    //    if (PlayerState)
+    //    {
+    //        //FString Name;
+    //        //PlayerState->GetPlayerController()->GetCharacter()->GetName(Name);
+    //        UKismetSystemLibrary::PrintString(this, PlayerState->GetPlayerName());
+
+    //        APlayerController* controller = PlayerState->GetPlayerController();
+    //        if (controller)
+    //        {
+    //            FString name;
+    //            controller->GetName(name);
+
+    //            UKismetSystemLibrary::PrintString(this, name);
+    //        }
+    //    }
+    //}
+
+    //
+
     if (AMSGOCharacter* msgoChara = Cast<AMSGOCharacter>(UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0)))
     {
+        UGameInstance* instance = this->GetWorld()->GetGameInstance();
+        if (instance)
+        {
+            //instance->GetNumLocalPlayers
+        }
+
         UIManager->SetupOnBeginPlay(msgoChara);
     }
 
