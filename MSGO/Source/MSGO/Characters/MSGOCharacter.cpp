@@ -33,6 +33,10 @@ AMSGOCharacter::AMSGOCharacter(const FObjectInitializer& ObjectInitializer)
 
 	// ステータスコンポーネントをアタッチ
 	StatusComponent = CreateDefaultSubobject<UCharacterStatusComponent>(TEXT("CharacterStatusComponent"));
+	if (StatusComponent)
+	{
+		StatusComponent->SetIsReplicated(true);
+	}
 
 	// ダメージコリジョンをアタッチ
 	DamageCollision = CreateDefaultSubobject<UDamageCollision>(TEXT("DamageCollision"));

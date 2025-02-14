@@ -10,6 +10,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameState/MSGOGameState.h"
 #include "UI/MSGOUIManager.h"
+#include "Engine/NetDriver.h"
+#include "Engine/Engine.h"
+#include "Net/UnrealNetwork.h"
 
 UBoostCalculator::UBoostCalculator()
 	: NowBoostState(EBOOST_STATE::None)
@@ -181,8 +184,6 @@ UCharacterStatusComponent::UCharacterStatusComponent()
 	OnSetupHPDelegate.Clear();
 	OnChangeBoostDelegate.Clear();
 	OnSetupBoostDelegate.Clear();
-
-
 }
 
 
@@ -233,6 +234,14 @@ void UCharacterStatusComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	}
 }
 
+void UCharacterStatusComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UCharacterStatusComponent, NowHP);
+}
+
+
 // パラメータのセットアップ
 // @param			InMachineID		機体ID
 void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
@@ -247,7 +256,8 @@ void UCharacterStatusComponent::SetupParameter(int32 InMachineID)
 	BoostCalculator->SetupStatusParam(StatusParameter);
 
 
-	NowHP = MaxHP = StatusParameter.MaxHP;
+	/*NowHP = */MaxHP = StatusParameter.MaxHP;
+	SetNowHP(MaxHP);
 	NowDownPoint = MaxDownPoint = StatusParameter.MaxDownPoint;
 	NowBoostCap = MaxBoostCap = BoostCalculator->GetNowBoostCap();
 
@@ -342,7 +352,8 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 		break;
 	}
 
-	NowHP -= damage;
+	SetNowHP(NowHP - damage);
+	//NowHP -= damage;
 	NowDownPoint -= InAttackPowerParam.DownPoint;
 
 
@@ -353,7 +364,7 @@ void UCharacterStatusComponent::AddDamage(const FAttackCollisionPowerParameter& 
 	}
 
 	// HP変更時のデリゲートを実行
-	if (OnChangeHPDelegate.IsBound())
+	if (OnChangeHPDelegate.IsBound() && GetOwner()->HasAuthority())
 	{
 		OnChangeHPDelegate.Broadcast(NowHP);
 	}
@@ -384,4 +395,31 @@ void UCharacterStatusComponent::CreateBoostCalculator()
 	check(BoostCalculator);
 
 	BoostCalculator->SetOwnerCharacter(OwnerCharacter);
+}
+
+void UCharacterStatusComponent::OnRep_NowHP()
+{
+	UKismetSystemLibrary::PrintString(this, TEXT("OnRep_NowHP"));
+
+	// HP変更時のデリゲートを実行
+	if (OnChangeHPDelegate.IsBound() && !GetOwner()->HasAuthority())
+	{
+		OnChangeHPDelegate.Broadcast(NowHP);
+	}
+
+}
+
+void UCharacterStatusComponent::SetNowHP(const float& InHP)
+{
+	NowHP = InHP;
+
+	if (!GetOwner()->HasAuthority())
+	{
+		Server_SetNowHP(NowHP);
+	}
+}
+
+void UCharacterStatusComponent::Server_SetNowHP_Implementation(const float& InHP)
+{
+	NowHP = InHP;
 }

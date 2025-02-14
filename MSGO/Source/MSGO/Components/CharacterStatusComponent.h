@@ -136,6 +136,8 @@ protected:
 
 	void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -187,6 +189,16 @@ public:
 
 	void OnSetupDelegateBind();
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetNowHP(const float& InHP);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetNowHP(const float& InHP);
+
+	UFUNCTION()
+	void OnRep_NowHP();
+
 private:
 	void CreateBoostCalculator();
 
@@ -206,7 +218,7 @@ public:
 
 protected:
 	// 現在のHP
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStatus", ReplicatedUsing = OnRep_NowHP)
 	float NowHP;
 	// 最大HP
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "CharacterStatus")

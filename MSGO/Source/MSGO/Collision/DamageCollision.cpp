@@ -82,6 +82,11 @@ void UDamageCollision::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActo
 		//	return;
 		//}
 
+		if (!ownerChara->HasAuthority())
+		{
+			return;
+		}
+
 		// 使用者と被弾者のIDが同じ場合は処理しない
 		if (attackColl->GetOwnerTeamID() == ownerChara->MachineTeamID)
 		{
